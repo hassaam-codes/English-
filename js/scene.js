@@ -20,58 +20,46 @@ if (!canvas || !hasWebGL()) {
   start().catch(() => document.documentElement.classList.add("no-webgl"));
 }
 
-/* Draw one paper as a texture, using the real text from the PDF. */
+/* Draw one paper as a study card (not a copy of the PDF page). */
 function paperTexture(p, renderer) {
-  const W = 600, H = 848;
+  const W = 600, H = 800;
   const c = document.createElement("canvas");
   c.width = W; c.height = H;
   const g = c.getContext("2d");
-  g.fillStyle = "#fbfbf8"; g.fillRect(0, 0, W, H);
+  g.fillStyle = "#ffffff"; g.fillRect(0, 0, W, H);
+  g.fillStyle = "#1d4ed8"; g.fillRect(0, 0, W, 14);
 
-  g.fillStyle = "#1b1b1b";
-  g.font = "700 30px 'Noto Serif', Georgia, serif";
-  g.fillText(`Lahore Board ${p.year} — Group ${p.group}`, 40, 72);
-  g.fillRect(40, 88, W - 80, 3);
-  g.fillStyle = "#777";
-  g.font = "400 15px 'Noto Serif', Georgia, serif";
-  g.fillText(p.code, 40, 118);
+  g.fillStyle = "#6e6e73";
+  g.font = "500 26px Geist, system-ui, sans-serif";
+  g.fillText("Lahore Board", 48, 96);
+
+  g.fillStyle = "#171717";
+  g.font = "500 168px Geist, system-ui, sans-serif";
+  g.fillText(String(p.year), 40, 290);
+  g.fillStyle = "#525252";
+  g.font = "400 48px Geist, system-ui, sans-serif";
+  g.fillText(`Group ${p.group}`, 48, 366);
 
   if (p.alp) {
-    g.fillStyle = "#fde9a6"; g.strokeStyle = "#e6c55a"; g.lineWidth = 2;
-    roundRect(g, W - 220, 104, 180, 28, 6); g.fill(); g.stroke();
-    g.fillStyle = "#3c2f00"; g.font = "700 13px 'Noto Serif', serif";
-    g.fillText("NEW COURSE (ALP)", W - 200, 123);
+    g.fillStyle = "#fdf0c2"; roundRect(g, 48, 400, 250, 44, 8); g.fill();
+    g.fillStyle = "#5a4300"; g.font = "600 22px Geist, system-ui, sans-serif";
+    g.fillText("NEW COURSE (ALP)", 64, 430);
   }
 
-  const badge = (label, y) => {
-    g.fillStyle = "#222"; roundRect(g, 40, y - 22, 52, 30, 6); g.fill();
-    g.fillStyle = "#fff"; g.font = "700 17px 'Noto Serif', serif"; g.fillText(label, 49, y);
+  // First translation sentence, as a taste of the paper
+  g.fillStyle = "#171717";
+  g.font = "400 34px 'Noto Nastaliq Urdu', serif";
+  g.textAlign = "right"; g.direction = "rtl";
+  g.fillText(p.q8[0], W - 48, 540);
+  g.textAlign = "left"; g.direction = "ltr";
+
+  const row = (label, text, y) => {
+    g.fillStyle = "#1d4ed8"; roundRect(g, 48, y - 34, 76, 46, 10); g.fill();
+    g.fillStyle = "#ffffff"; g.font = "500 24px 'Geist Mono', monospace"; g.fillText(label, 60, y - 3);
+    g.fillStyle = "#525252"; g.font = "400 26px Geist, system-ui, sans-serif"; g.fillText(text, 144, y - 3);
   };
-  badge("Q.8", 175);
-  g.fillStyle = "#1b1b1b"; g.font = "700 17px 'Noto Serif', serif";
-  g.fillText("Translate any FIVE of the following…", 104, 175);
-
-  g.font = "400 25px 'Noto Nastaliq Urdu', serif";
-  g.textAlign = "right";
-  p.q8.slice(0, 5).forEach((s, i) => {
-    g.direction = "rtl";
-    g.fillText(s, W - 50, 232 + i * 52);
-  });
-  g.direction = "ltr";
-  g.textAlign = "left";
-
-  badge("Q.9", 520);
-  g.fillStyle = "#1b1b1b"; g.font = "700 17px 'Noto Serif', serif";
-  g.fillText("Change the voice of the following:", 104, 520);
-  g.font = "400 18px 'Noto Serif', serif";
-  const roman = ["(i)", "(ii)", "(iii)", "(iv)", "(v)"];
-  p.q9.forEach((s, i) => {
-    g.fillStyle = "#888"; g.fillText(roman[i], 52, 568 + i * 40);
-    g.fillStyle = "#1b1b1b"; g.fillText(s, 110, 568 + i * 40);
-  });
-
-  g.fillStyle = "#999"; g.font = "400 12px 'Noto Serif', serif"; g.textAlign = "center";
-  g.fillText(`Page ${p.page} of 13`, W / 2, H - 28);
+  row("Q.8", `${p.q8.length} translation sentences`, 660);
+  row("Q.9", `${p.q9.length} change the voice`, 728);
 
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
@@ -89,8 +77,8 @@ async function start() {
   try {
     await Promise.all([
       document.fonts.load("400 25px 'Noto Nastaliq Urdu'", "اردو"),
-      document.fonts.load("700 30px 'Noto Serif'"),
-      document.fonts.load("400 18px 'Noto Serif'"),
+      document.fonts.load("500 168px Geist"),
+      document.fonts.load("500 24px 'Geist Mono'"),
     ]);
   } catch (e) {}
 
@@ -115,7 +103,7 @@ async function start() {
   const helix = new THREE.Group();
   scene.add(helix);
 
-  const SW = 1.5, SH = SW * 1.414;
+  const SW = 1.5, SH = SW * (800 / 600);
   const geo = new THREE.BoxGeometry(SW, SH, 0.012);
   const edgeMat = new THREE.MeshStandardMaterial({ color: 0xdedcd4, roughness: 0.9 });
 
@@ -145,7 +133,7 @@ async function start() {
     if (!width || !height) return;
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
-    camera.position.z = width < 520 ? 12.5 : 10.6;
+    camera.position.z = width < 520 ? 11.5 : 10.6;
     camera.updateProjectionMatrix();
     needsFrame = true;
   };

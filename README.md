@@ -5,11 +5,12 @@ A static website for the Q.8 (Urdu to English translation) and Q.9 (change the v
 All question text is copied exactly from `assets/Past_papers.pdf` and lives in `js/data.js`.
 
 ## Features
-- 3D hero (Three.js): the ten papers float in a helix. Drag to spin, click a sheet to jump to that paper.
-- Each paper is shown as a "sheet" laid out like the PDF page (Urdu in Nastaliq).
-- Filter by year and group, search any sentence (English or Urdu), or show only repeated questions.
-- Repeated items are tagged on every paper; the repeated-questions tables link back to each paper.
-- Light and dark themes, mobile layout, reduced-motion support, PDF download.
+Built mobile first, like an app, with a bottom tab bar:
+- **Home:** 3D ring of the ten papers as study cards (drag to spin, tap to open), your progress, and a swipeable row of papers.
+- **Papers:** pick a paper from the chip row or swipe left and right between papers. Switch between Q.8, Q.9 and the English medium question. Tick sentences you have practised. Search every paper in English or Urdu.
+- **Practice:** a flashcard deck for Q.8, Q.9 or only repeated questions. Swipe right if you can do it, left to see it again later.
+- **Repeated:** every repeated question with how many times it came, each paper tappable.
+- Progress is saved on the device. Light and dark themes, reduced-motion support, PDF download.
 
 ## Run locally
 No build step. Serve the folder with any static server:

@@ -2,17 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>9th English Past Papers</title>
-  <meta name="description" content="9th Class English, Lahore Board past papers 2022 to 2026 (Group I and Group II). Q.8 Urdu to English translation and Q.9 change the voice, with every repeated question." />
-  <meta name="theme-color" content="#141415" />
+  <meta name="description" content="9th Class English, Lahore Board past papers 2022 to 2026 (Group I and Group II). Practise Q.8 Urdu to English translation and Q.9 change the voice, with every repeated question." />
+  <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#141415" media="(prefers-color-scheme: dark)" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&family=Noto+Nastaliq+Urdu:wght@400;600&family=Noto+Serif:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/light/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css" />
   <link rel="stylesheet" href="css/styles.css" />
   <script>
-    // Apply saved theme before paint to avoid a flash.
     try { const t = localStorage.getItem("lb9-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
   <script type="importmap">
@@ -20,127 +22,121 @@
   </script>
 </head>
 <body>
-  <!-- Floating island nav -->
-  <header class="nav-wrap">
-    <nav class="nav" aria-label="Main">
-      <a class="brand" href="#top" aria-label="Back to top">
-        <span class="brand-mark">9</span>
-        <span class="brand-text">English Papers</span>
-      </a>
-      <div class="nav-links">
-        <a href="#index" data-spy="index">Index</a>
-        <a href="#papers" data-spy="papers">Papers</a>
-        <a href="#repeated" data-spy="repeated">Repeated</a>
-      </div>
-      <button class="icon-btn theme-toggle" type="button" aria-label="Switch colour theme">
-        <i class="ph-light ph-moon-stars" aria-hidden="true"></i>
-      </button>
-      <button class="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu">
-        <span></span><span></span>
-      </button>
-    </nav>
+  <header class="topbar">
+    <a class="brand" href="#/home" aria-label="Home">
+      <span class="brand-mark">9</span>
+      <span class="brand-text">English Papers</span>
+    </a>
+    <div class="topbar-actions">
+      <a class="icon-btn" href="assets/Past_papers.pdf" download aria-label="Download PDF"><i class="ph ph-download-simple" aria-hidden="true"></i></a>
+      <button class="icon-btn theme-toggle" type="button" aria-label="Switch colour theme"><i class="ph ph-moon" aria-hidden="true"></i></button>
+    </div>
   </header>
 
-  <div class="menu" id="menu" hidden>
-    <a href="#index">Index</a>
-    <a href="#papers">Papers</a>
-    <a href="#repeated">Repeated</a>
-    <a href="assets/Past_papers.pdf" download>Download PDF</a>
-  </div>
-
-  <main id="top">
-    <!-- HERO -->
-    <section class="hero">
-      <div class="hero-copy">
-        <h1 class="reveal" id="hero-title"></h1>
-        <p class="hero-sub reveal" id="hero-sub"></p>
-        <p class="hero-qs reveal" id="hero-qs"></p>
-        <div class="hero-ctas reveal">
-          <a class="btn btn-primary" href="#papers">
-            <span>Open papers</span>
-            <span class="btn-icon"><i class="ph-light ph-arrow-down-right" aria-hidden="true"></i></span>
-          </a>
-          <a class="btn btn-ghost" href="assets/Past_papers.pdf" download>
-            <span>Download PDF</span>
-            <span class="btn-icon"><i class="ph-light ph-file-pdf" aria-hidden="true"></i></span>
-          </a>
-        </div>
-      </div>
-      <div class="hero-stage reveal" id="stage">
-        <canvas id="scene" aria-label="3D stack of the ten past papers. Click a sheet to open it." role="img"></canvas>
-        <p class="stage-hint"><i class="ph-light ph-hand-pointing" aria-hidden="true"></i> Drag to spin, click a sheet to open it</p>
-      </div>
-    </section>
-
-    <!-- INDEX (cover page box) -->
-    <section class="section" id="index">
-      <div class="container">
-        <div class="bezel cover-shell reveal">
-          <div class="bezel-core cover">
-            <h2 class="cover-head" id="cover-head"></h2>
-            <div class="paper-grid" id="paper-grid"></div>
-            <p class="cover-note" id="cover-note"></p>
+  <main id="app">
+    <!-- HOME -->
+    <section class="view" id="view-home" data-view="home" aria-labelledby="hero-title">
+      <div class="hero">
+        <div class="hero-copy">
+          <h1 id="hero-title"></h1>
+          <p class="hero-sub" id="hero-sub"></p>
+          <p class="hero-qs" id="hero-qs"></p>
+          <div class="hero-ctas">
+            <a class="btn btn-primary" href="#/practice"><i class="ph ph-cards" aria-hidden="true"></i><span>Start practice</span></a>
+            <a class="btn btn-ghost" href="#/papers"><span>Browse papers</span></a>
           </div>
         </div>
+        <div class="hero-stage" id="stage">
+          <canvas id="scene" role="img" aria-label="3D ring of the ten papers. Drag to spin, tap one to open it."></canvas>
+          <p class="stage-hint">Drag to spin, tap a card to open it</p>
+        </div>
       </div>
+
+      <div class="progress-card" id="progress-card"></div>
+
+      <div class="block">
+        <h2 class="block-title" id="cover-head"></h2>
+        <div class="rail" id="paper-rail" role="list"></div>
+        <p class="cover-note" id="cover-note"></p>
+      </div>
+      <p class="footer-text" id="footer-text"></p>
     </section>
 
     <!-- PAPERS -->
-    <section class="section" id="papers">
-      <div class="container">
-        <h2 class="section-title reveal">The ten papers, word for word</h2>
-        <p class="section-lead reveal">Filter by year or group, search any sentence in English or Urdu, or show only the items the board has asked more than once.</p>
+    <section class="view" id="view-papers" data-view="papers" hidden aria-label="Papers">
+      <div class="view-head">
+        <h2 class="view-title">Papers</h2>
+        <label class="search">
+          <span class="sr-only">Search all papers</span>
+          <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+          <input id="search" type="search" placeholder="Search all papers" autocomplete="off" enterkeyhint="search" />
+        </label>
+      </div>
 
-        <div class="toolbar-wrap">
-          <div class="toolbar" role="search">
-            <div class="chips" id="year-chips" role="group" aria-label="Filter by year"></div>
-            <div class="chips" id="group-chips" role="group" aria-label="Filter by group"></div>
-            <label class="search">
-              <span class="sr-only">Search sentences</span>
-              <i class="ph-light ph-magnifying-glass" aria-hidden="true"></i>
-              <input id="search" type="search" placeholder="Search sentences" autocomplete="off" />
-            </label>
-            <button class="toggle" id="rep-toggle" type="button" aria-pressed="false">
-              <i class="ph-light ph-repeat" aria-hidden="true"></i> Repeated only
-            </button>
-          </div>
+      <div id="paper-mode">
+        <div class="chip-rail" id="paper-chips" aria-label="Choose a paper"></div>
+        <div class="swipe-zone" id="swipe-zone">
+          <div class="paper" id="paper"></div>
         </div>
-
-        <p class="result-count" id="result-count" aria-live="polite"></p>
-        <div class="sheets" id="sheets"></div>
-        <div class="empty" id="empty" hidden>
-          <i class="ph-light ph-files" aria-hidden="true"></i>
-          <p>No sentence matches that search.</p>
-          <button class="btn btn-ghost btn-sm" id="clear" type="button"><span>Clear filters</span></button>
+        <div class="pager">
+          <button class="btn btn-ghost btn-sm" id="prev" type="button"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>Previous</span></button>
+          <span class="pager-count" id="pager-count"></span>
+          <button class="btn btn-ghost btn-sm" id="next" type="button"><span>Next</span><i class="ph ph-arrow-right" aria-hidden="true"></i></button>
         </div>
       </div>
+
+      <div id="search-mode" hidden>
+        <p class="meta-line" id="search-count" aria-live="polite"></p>
+        <div id="search-results"></div>
+      </div>
+    </section>
+
+    <!-- PRACTICE -->
+    <section class="view" id="view-practice" data-view="practice" hidden aria-label="Practice">
+      <div class="view-head">
+        <h2 class="view-title">Practice</h2>
+        <div class="segmented" id="deck-filter" aria-label="Choose questions">
+          <button type="button" data-deck="q8">Q.8</button>
+          <button type="button" data-deck="q9">Q.9</button>
+          <button type="button" data-deck="rep">Repeated</button>
+        </div>
+      </div>
+      <p class="meta-line" id="deck-count" aria-live="polite"></p>
+      <div class="deck" id="deck"></div>
+      <div class="deck-actions">
+        <button class="round-btn" id="again" type="button" aria-label="See it again later"><i class="ph ph-arrow-counter-clockwise" aria-hidden="true"></i></button>
+        <button class="round-btn" id="shuffle" type="button" aria-label="Shuffle"><i class="ph ph-shuffle" aria-hidden="true"></i></button>
+        <button class="round-btn round-btn-primary" id="gotit" type="button" aria-label="I can do this one"><i class="ph ph-check" aria-hidden="true"></i></button>
+      </div>
+      <p class="deck-help">Swipe right if you can do it, left to see it again later</p>
     </section>
 
     <!-- REPEATED -->
-    <section class="section" id="repeated">
-      <div class="container">
-        <div class="rep-head reveal">
-          <h2 class="section-title" id="rep-title"></h2>
-          <p class="section-lead" id="rep-intro"></p>
-        </div>
-        <div class="rep-grid">
-          <div class="bezel reveal"><div class="bezel-core rep-block" id="rep-q8"></div></div>
-          <div class="bezel reveal"><div class="bezel-core rep-block" id="rep-q9"></div></div>
-          <div class="bezel reveal"><div class="bezel-core rep-block" id="rep-topics"></div></div>
+    <section class="view" id="view-repeated" data-view="repeated" hidden aria-labelledby="rep-title">
+      <div class="view-head">
+        <h2 class="view-title" id="rep-title"></h2>
+        <p class="view-lead" id="rep-intro"></p>
+        <div class="segmented" id="rep-filter" aria-label="Repeated question type">
+          <button type="button" data-rep="q8">Q.8</button>
+          <button type="button" data-rep="q9">Q.9</button>
+          <button type="button" data-rep="topics">Topics</button>
         </div>
       </div>
+      <h3 class="list-title" id="rep-list-title"></h3>
+      <div class="rep-list" id="rep-list"></div>
+      <p class="meta-line" id="rep-note"></p>
     </section>
   </main>
 
-  <footer class="footer">
-    <div class="container footer-inner">
-      <p id="footer-text"></p>
-      <a class="btn btn-ghost btn-sm" href="assets/Past_papers.pdf" download>
-        <span>Download PDF</span>
-        <span class="btn-icon"><i class="ph-light ph-download-simple" aria-hidden="true"></i></span>
-      </a>
-    </div>
-  </footer>
+  <nav class="tabbar" aria-label="Main">
+    <span class="tab-indicator" aria-hidden="true"></span>
+    <a class="tab" href="#/home" data-tab="home"><i class="ph ph-house" aria-hidden="true"></i><span>Home</span></a>
+    <a class="tab" href="#/papers" data-tab="papers"><i class="ph ph-files" aria-hidden="true"></i><span>Papers</span></a>
+    <a class="tab" href="#/practice" data-tab="practice"><i class="ph ph-cards" aria-hidden="true"></i><span>Practice</span></a>
+    <a class="tab" href="#/repeated" data-tab="repeated"><i class="ph ph-repeat" aria-hidden="true"></i><span>Repeated</span></a>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script type="module" src="js/app.js"></script>
   <script type="module" src="js/scene.js"></script>
