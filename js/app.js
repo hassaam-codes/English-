@@ -157,8 +157,8 @@ function openPaper(id) {
   const sheet = el.querySelector(".sheet");
   if (!reduceMotion && sheet.animate) {
     sheet.animate(
-      [{ boxShadow: "0 0 0 0 rgba(52,197,138,.0)" }, { boxShadow: "0 0 0 6px rgba(52,197,138,.45)" }, { boxShadow: "0 0 0 0 rgba(52,197,138,.0)" }],
-      { duration: 1600, delay: 500, easing: "cubic-bezier(0.16,1,0.3,1)" }
+      [{ outline: "2px solid transparent" }, { outline: "2px solid var(--accent)" }, { outline: "2px solid transparent" }],
+      { duration: 1400, delay: 500, easing: "cubic-bezier(0.22,1,0.36,1)" }
     );
   }
 }
@@ -272,5 +272,5 @@ const spy = new IntersectionObserver(
 
 /* ---------- Init ---------- */
 document.querySelectorAll(".reveal").forEach(observeReveal);
-document.querySelectorAll(".tile").forEach((el) => bindTilt(el, 9));
+document.querySelectorAll(".tile").forEach((el) => bindTilt(el, 5));
 render();

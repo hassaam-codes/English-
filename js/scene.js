@@ -107,9 +107,10 @@ async function start() {
   const key = new THREE.DirectionalLight(0xffffff, 2.2);
   key.position.set(3, 4, 6);
   scene.add(key);
-  const rim = new THREE.PointLight(0x34c58a, 30, 20);
-  rim.position.set(-3, -1, 2);
-  scene.add(rim);
+  // Neutral fill from the lower left, so the sheets read as paper, not tinted.
+  const fill = new THREE.DirectionalLight(0xffffff, 0.6);
+  fill.position.set(-3, -1, 2);
+  scene.add(fill);
 
   const helix = new THREE.Group();
   scene.add(helix);
@@ -120,7 +121,7 @@ async function start() {
 
   const sheets = PAPERS.map((p, i) => {
     const map = paperTexture(p, renderer);
-    const front = new THREE.MeshStandardMaterial({ map, roughness: 0.85, emissive: 0x34c58a, emissiveIntensity: 0 });
+    const front = new THREE.MeshStandardMaterial({ map, roughness: 0.85 });
     // Box back faces are already UV-mapped to read correctly from behind.
     const back = new THREE.MeshStandardMaterial({ map, roughness: 0.85 });
     const mesh = new THREE.Mesh(geo, [edgeMat, edgeMat, edgeMat, edgeMat, front, back]);
@@ -136,29 +137,7 @@ async function start() {
     return mesh;
   });
 
-  // Dust particles
-  const N = 500;
-  const pos = new Float32Array(N * 3);
-  for (let i = 0; i < N; i++) {
-    pos[i * 3] = (Math.random() - 0.5) * 12;
-    pos[i * 3 + 1] = (Math.random() - 0.5) * 8;
-    pos[i * 3 + 2] = (Math.random() - 0.5) * 8 - 1;
-  }
-  const dustGeo = new THREE.BufferGeometry();
-  dustGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-  const dustMat = new THREE.PointsMaterial({ size: 0.025, color: 0x34c58a, transparent: true, opacity: 0.55, depthWrite: false });
-  const dust = new THREE.Points(dustGeo, dustMat);
-  scene.add(dust);
 
-  const applyTheme = () => {
-    const t = document.documentElement.dataset.theme;
-    const dark = t ? t === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
-    dustMat.color.set(dark ? 0x34c58a : 0x0f7a52);
-    dustMat.opacity = dark ? 0.55 : 0.35;
-    rim.color.set(dark ? 0x34c58a : 0x0f7a52);
-    needsFrame = true;
-  };
-  window.addEventListener("theme-change", applyTheme);
 
   // Size
   const resize = () => {
@@ -243,10 +222,7 @@ async function start() {
       m.scale.setScalar(1 + l * 0.08);
       m.position.y = reduceMotion ? 0 : Math.sin(t * 0.8 + m.userData.phase) * 0.05;
       m.rotation.z = reduceMotion ? 0 : Math.sin(t * 0.5 + m.userData.phase) * 0.02;
-      m.userData.front.emissiveIntensity = l * 0.08;
     }
-    dust.rotation.y = t * 0.02;
-    dust.position.y = reduceMotion ? 0 : Math.sin(t * 0.3) * 0.1;
     renderer.render(scene, camera);
   }
   function loop() {
@@ -265,7 +241,6 @@ async function start() {
   }
 
   resize();
-  applyTheme();
   frame();
   loop();
 }
