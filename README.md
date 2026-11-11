@@ -12,7 +12,7 @@ Built mobile first, like an app, with a bottom tab bar:
 - **Answers:** suggested answers live in `js/answers.js` (they are not from the board or the source PDF). In Papers, tap a sentence to show its answer.
 - **Repeated:** every repeated question with how many times it came, each paper tappable.
 - **Notes:** PDFs and images uploaded by the admin, listed for students to open.
-- **Admin (`/#/admin`):** sign in to upload and delete notes. Needs Supabase; see `supabase/README.md`.
+- **Admin (`/#/admin`):** sign in (username and password in `js/config.js`) to upload notes with a title, or delete them. Files are kept in Supabase Storage; see `supabase/README.md`.
 - Progress is saved on the device. Light and dark themes, reduced-motion support, PDF download.
 
 ## Run locally
@@ -45,6 +45,6 @@ Content can be served from Supabase (read-only for the public). See [`supabase/R
 - `js/data.js`: all paper text (edit here to add a new year)
 - `js/app.js`: the app (tabs, papers, practice deck, search, theme)
 - `js/content.js`: loads content from Supabase, with a saved copy and the built-in copy as fallbacks
-- `js/config.js`: Supabase URL and publishable key
-- `js/supabase.js`: sign-in, rows and file storage over fetch
+- `js/config.js`: Supabase URL and publishable key, admin username and password
+- `js/supabase.js`: list, upload and delete files in the notes storage bucket
 - `js/notes.js`: the Notes page and the admin panel

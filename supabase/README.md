@@ -3,7 +3,7 @@
 The site can load its papers, questions, answers and repeated-question lists from Supabase.
 Until that is set up (or whenever Supabase cannot be reached) it uses the copy built into the site, so it never shows a blank page.
 
-## One-time setup
+## Papers content: one-time setup (optional)
 
 1. Open your Supabase project, go to **SQL Editor**, choose **New query**.
 2. Paste the whole of [`setup.sql`](setup.sql) and press **Run**. This creates four tables, makes them read-only for the public, and loads all the content.
@@ -12,25 +12,23 @@ Until that is set up (or whenever Supabase cannot be reached) it uses the copy b
 
 The publishable key is meant to be public. Never put the database password or a `service_role` / secret key in this repo.
 
-## Admin panel (uploading notes)
+## Notes uploads (admin page)
 
-The admin panel is at `/#/admin` on the site (for example `https://your-site.vercel.app/#/admin`). It is not in the menu.
+The admin page is at `/#/admin` on the site (for example `https://your-site.vercel.app/#/admin`). It is not in the menu.
+Sign in with the username and password set in `js/config.js` (`ADMIN_USERNAME`, `ADMIN_PASSWORD`), then
+upload a PDF or image with a title. It shows on the **Notes** tab for everyone straight away.
 
-Create the admin login once, after running `setup.sql`:
+Uploaded files need somewhere to live, so they are kept in a Supabase Storage bucket. One-time setup:
 
-1. In Supabase go to **Authentication > Users > Add user > Create new user**.
-2. Email: `admin@english-papers.app`. Password: choose your own. Tick **Auto Confirm User**.
-3. On the site, sign in with username `admin` and that password.
+1. In Supabase open **SQL Editor > New query**, paste the whole of [`notes.sql`](notes.sql) and press **Run**.
+2. Copy the **publishable** (anon) key from **Project Settings > API Keys** into `js/config.js` as `SUPABASE_KEY`.
 
-The password is checked by Supabase. It is not stored anywhere in the site's code, so do not add it there.
-Pick a password that is hard to guess: anyone who has it can upload and delete notes.
+There are no tables and no user accounts for this. The title is stored inside the file's name.
 
-What the admin can do: upload a PDF or image (up to 25 MB) with a title and description, and delete uploads.
-Uploads appear on the **Notes** tab for everyone straight away.
-
-Only email addresses listed in the `admins` table can upload or delete, even if someone else manages to
-create an account. To add a second admin, create their user as above (username `teacher` means the email
-`teacher@english-papers.app`) and add that email as a row in `admins`.
+**How protected is it?** The username and password are a simple lock in the site's code. Anyone who reads
+the code can see them, and the storage bucket accepts uploads and deletes from the website. The bucket is
+limited to PDFs and images of up to 25 MB, and nothing outside that bucket can be touched.
+If notes are ever tampered with, change the password in `js/config.js`; for a real lock, ask for a proper login.
 
 ## Editing content
 
@@ -42,8 +40,6 @@ Use **Table Editor** in Supabase:
 | `questions` | every Q.8 and Q.9 sentence with its `answer`; `position` 0 is (i), 1 is (ii) and so on |
 | `repeated` | the repeated-question lists (`kind` is `q8`, `q9` or `topics`) |
 | `site_text` | headings and notes shown on the site |
-| `notes` | files uploaded from the admin panel (the files themselves are in Storage > `notes`) |
-| `admins` | email addresses allowed to upload and delete |
 
 To add a new year: add a row to `papers` (give it the next `sort` number), then its rows in `questions`
 with ids like `2027-1-q8-0`. It appears on the site by itself.

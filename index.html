@@ -138,8 +138,8 @@
       </div>
 
       <div class="panel" id="admin-setup" hidden>
-        <p class="panel-title">Database not connected yet</p>
-        <p class="panel-text">Uploading needs Supabase. Run <code>supabase/setup.sql</code>, add the publishable key to <code>js/config.js</code>, and create the admin user. The steps are in <code>supabase/README.md</code>.</p>
+        <p class="panel-title">File storage not connected yet</p>
+        <p class="panel-text">Uploads need a place to be stored. Run <code>supabase/notes.sql</code> in Supabase and add the publishable key to <code>js/config.js</code>. The steps are in <code>supabase/README.md</code>.</p>
       </div>
 
       <form class="panel form" id="admin-login" hidden novalidate>
@@ -160,11 +160,7 @@
           <p class="panel-title">Upload notes</p>
           <div class="field">
             <label for="note-title">Title</label>
-            <input id="note-title" name="title" type="text" maxlength="120" required />
-          </div>
-          <div class="field">
-            <label for="note-desc">Description <span class="optional">(optional)</span></label>
-            <textarea id="note-desc" name="description" rows="2" maxlength="400"></textarea>
+            <input id="note-title" name="title" type="text" maxlength="80" required />
           </div>
           <div class="field">
             <label for="note-file">File</label>
