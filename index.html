@@ -37,7 +37,6 @@
       <span class="brand-text">English Papers</span>
     </a>
     <div class="topbar-actions">
-      <a class="icon-btn" href="assets/English_Papers_2022-2026.pdf" download aria-label="Download PDF"><i class="ph ph-download-simple" aria-hidden="true"></i></a>
       <button class="icon-btn theme-toggle" type="button" aria-label="Switch colour theme"><i class="ph ph-moon" aria-hidden="true"></i></button>
     </div>
   </header>
@@ -45,36 +44,20 @@
   <main id="app">
     <!-- HOME -->
     <section class="view" id="view-home" data-view="home" aria-labelledby="hero-title">
-      <div class="hero">
-        <div class="hero-copy">
-          <h1 id="hero-title"></h1>
-          <p class="hero-sub" id="hero-sub"></p>
-          <p class="hero-qs" id="hero-qs"></p>
-          <div class="hero-ctas">
-            <a class="btn btn-primary" href="#/practice"><i class="ph ph-cards" aria-hidden="true"></i><span>Start practice</span></a>
-            <a class="btn btn-ghost" href="#/papers"><span>Browse papers</span></a>
-          </div>
-        </div>
-        <a class="preview" href="#/practice" id="preview" aria-label="Most repeated questions. Open practice.">
-          <span class="preview-stack" id="preview-stack"></span>
-          <span class="preview-foot"><span>Most repeated questions</span><i class="ph ph-arrow-right" aria-hidden="true"></i></span>
-        </a>
+      <div class="home">
+        <h1 id="hero-title"></h1>
+        <p class="home-sub" id="hero-sub"></p>
+        <a class="btn btn-primary home-cta" href="#/practice"><span>Start practice</span><i class="ph ph-arrow-right" aria-hidden="true"></i></a>
       </div>
-
-      <div class="progress-card" id="progress-card"></div>
-
-      <div class="block">
-        <h2 class="block-title" id="cover-head"></h2>
-        <div class="rail" id="paper-rail" role="list"></div>
-        <p class="cover-note" id="cover-note"></p>
-      </div>
-      <p class="footer-text" id="footer-text"></p>
     </section>
 
     <!-- PAPERS -->
     <section class="view" id="view-papers" data-view="papers" hidden aria-label="Papers">
       <div class="view-head">
-        <h2 class="view-title">Papers</h2>
+        <div class="view-title-row">
+          <h2 class="view-title">Papers</h2>
+          <a class="icon-btn" href="assets/English_Papers_2022-2026.pdf" download aria-label="Download PDF"><i class="ph ph-download-simple" aria-hidden="true"></i></a>
+        </div>
         <label class="search">
           <span class="sr-only">Search all papers</span>
           <i class="ph ph-magnifying-glass" aria-hidden="true"></i>

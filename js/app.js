@@ -30,8 +30,6 @@ const saveDone = () => { try { localStorage.setItem("lb9-done", JSON.stringify([
 function setDone(id, on) {
   on ? done.add(id) : done.delete(id);
   saveDone();
-  renderProgress();
-  renderRail();
 }
 
 /* ---------- Toast ---------- */
@@ -113,70 +111,6 @@ document.addEventListener("click", (e) => {
 /* ---------- Home ---------- */
 $("#hero-title").textContent = COVER.title;
 $("#hero-sub").textContent = COVER.subtitle;
-$("#hero-qs").innerHTML = `<strong>Q.8</strong> ${esc(COVER.q8)} &nbsp;•&nbsp; <strong>Q.9</strong> ${esc(COVER.q9)}`;
-$("#cover-head").textContent = COVER.boxHeading;
-$("#cover-note").innerHTML = COVER.boxNote;
-$("#footer-text").textContent = COVER.footer;
-
-/* Home preview: a small stack of the most repeated questions, cycling like the practice deck. */
-(() => {
-  const rows = [REPEATED.q9[0], REPEATED.q8[0], REPEATED.q9[1], REPEATED.q8[1], REPEATED.q9[2], REPEATED.q9[3]];
-  const stack = $("#preview-stack");
-  stack.innerHTML = rows.map((r) => {
-    const ur = REPEATED.q8.includes(r);
-    return `<span class="pcard" data-depth="hidden">
-      <span class="p-top"><span class="p-q">${ur ? "Q.8" : "Q.9"}</span><span class="rep-tag">Repeated ${r.times}×</span></span>
-      <span class="p-body"><span class="${ur ? "ur" : "en"}" ${ur ? 'lang="ur" dir="rtl"' : ""}>${esc(r.items[0])}</span></span>
-      <span class="p-in">${esc(r.in)}</span>
-    </span>`;
-  }).join("");
-  const cards = [...stack.children];
-  let top = 0;
-  const lay = () => cards.forEach((c, i) => {
-    const d = (i - top + cards.length) % cards.length;
-    c.dataset.depth = d < 3 ? String(d) : d === cards.length - 1 && c.dataset.depth === "0" ? "out" : "hidden";
-  });
-  lay();
-  if (reduceMotion) return;
-  let timer = null;
-  const tick = () => { top = (top + 1) % cards.length; lay(); };
-  const start = () => { if (!timer) timer = setInterval(tick, 3200); };
-  const stop = () => { clearInterval(timer); timer = null; };
-  new IntersectionObserver(([en]) => (en.isIntersecting && !document.hidden ? start() : stop())).observe(stack);
-  document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
-})();
-
-function renderProgress() {
-  const n = done.size, total = ITEMS.length;
-  const C = 2 * Math.PI * 24;
-  $("#progress-card").innerHTML = `
-    <div class="big">${n} <small>of ${total}</small></div>
-    <div class="label">sentences practised on this phone</div>
-    <svg class="ring" viewBox="0 0 56 56" aria-hidden="true">
-      <circle class="track" cx="28" cy="28" r="24"></circle>
-      <circle class="fill" cx="28" cy="28" r="24" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - n / total)}"></circle>
-    </svg>
-    ${n ? '<button class="reset" type="button" id="reset">Reset progress</button>' : ""}`;
-}
-$("#progress-card").addEventListener("click", (e) => {
-  if (!e.target.closest("#reset")) return;
-  if (!confirm("Clear all practised marks on this device?")) return;
-  done.clear(); saveDone(); renderProgress(); renderRail(); toast("Progress cleared");
-});
-
-function renderRail() {
-  $("#paper-rail").innerHTML = PAPERS.map((p) => {
-    const mine = ITEMS.filter((it) => it.paper === p);
-    const d = mine.filter((it) => done.has(it.id)).length;
-    return `<a class="year-card" role="listitem" href="#/papers/${p.id}">
-      <span>
-        <span class="y">${p.year}</span>
-        ${p.alp ? '<span class="alp" style="margin-top:8px;display:block;width:max-content">NEW COURSE (ALP)</span>' : ""}
-      </span>
-      <span><span class="g">Group ${p.group}</span><br /><span class="done">${d} of ${mine.length} done</span></span>
-    </a>`;
-  }).join("");
-}
 
 /* ---------- Papers ---------- */
 const paperState = { idx: 0, section: "q8", q: "" };
@@ -523,6 +457,7 @@ function route() {
   });
   window.scrollTo(0, 0);
   document.documentElement.classList.toggle("is-practice", view === "practice");
+  document.documentElement.classList.toggle("is-home", view === "home");
   current = view;
   document.dispatchEvent(new CustomEvent("view-change", { detail: view }));
 }
@@ -587,8 +522,6 @@ themeBtn.addEventListener("click", () => {
 syncThemeIcon();
 
 /* ---------- Init ---------- */
-renderProgress();
-renderRail();
 setDeckSeg("q8");
 buildDeck("q8");
 setRepSeg("q8");
