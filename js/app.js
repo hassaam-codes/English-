@@ -430,8 +430,13 @@ function route() {
     const dir = i >= 0 ? Math.sign(i - paperState.idx) : 0;
     if (i >= 0) paperState.idx = i;
     if (["q8", "q9", "alt"].includes(sec)) paperState.section = sec;
-    if (pid && paperState.q) { paperState.q = ""; $("#search").value = ""; renderSearch(); }
+    if (pid && pid !== "search" && paperState.q) { paperState.q = ""; $("#search").value = ""; renderSearch(); }
     if (changed || current !== "papers") renderPaper(current === "papers" ? dir : 0);
+  }
+  syncTabs(view === "papers" && pid === "search" ? "search" : view);
+  if (view === "papers" && pid === "search") {
+    if (paperState.q) { renderSearch(); }
+    requestAnimationFrame(() => { $("#search").focus({ preventScroll: true }); });
   }
   if (view === current) return;
   const from = ORDER.indexOf(current), to = ORDER.indexOf(view);
@@ -444,16 +449,47 @@ function route() {
       if (from >= 0) v.classList.add(to > from ? "from-right" : "from-left");
     }
   });
-  document.querySelectorAll(".tab").forEach((t) => {
-    if (t.dataset.tab === view) t.setAttribute("aria-current", "page"); else t.removeAttribute("aria-current");
-  });
-  $(".tab-indicator").style.transform = `translateX(${to * 100}%)`;
   window.scrollTo(0, 0);
   current = view;
   document.dispatchEvent(new CustomEvent("view-change", { detail: view }));
 }
 window.addEventListener("hashchange", route);
-document.querySelectorAll(".tab").forEach((t) => t.addEventListener("click", () => buzz()));
+document.querySelectorAll(".tab, .fab").forEach((t) => t.addEventListener("click", () => buzz()));
+function syncTabs(active) {
+  document.querySelectorAll(".tab, .fab").forEach((t) => {
+    const on = t.dataset.tab === active;
+    if (on) t.setAttribute("aria-current", "page"); else t.removeAttribute("aria-current");
+    const i = t.querySelector("i[data-icon]");
+    if (i) i.className = `${on ? "ph-fill" : "ph"} ph-${i.dataset.icon}`;
+  });
+}
+
+/* Notched background: redrawn to the bar's real size, so the curve never stretches. */
+(() => {
+  const nav = $(".tabbar");
+  const path = nav.querySelector(".tabbar-bg path");
+  const wide = matchMedia("(min-width: 960px)");
+  const draw = () => {
+    const W = nav.clientWidth, H = nav.clientHeight;
+    if (!W || !H) return;
+    const c = W / 2, R = 40, D = 36, S = 22;            // notch half-width, depth, shoulder
+    const tr = wide.matches ? 24 : 22;                  // top corner radius
+    const br = wide.matches ? 24 : 0;                   // bottom corners only on the floating bar
+    nav.querySelector(".tabbar-bg").setAttribute("viewBox", `0 0 ${W} ${H}`);
+    path.setAttribute("d", [
+      `M0 ${tr}`, `Q0 0 ${tr} 0`,
+      `H${c - R - S}`,
+      `C${c - R - 4} 0 ${c - R + 2} ${D} ${c} ${D}`,
+      `C${c + R - 2} ${D} ${c + R + 4} 0 ${c + R + S} 0`,
+      `H${W - tr}`, `Q${W} 0 ${W} ${tr}`,
+      `V${H - br}`, br ? `Q${W} ${H} ${W - br} ${H}` : "",
+      `H${br}`, br ? `Q0 ${H} 0 ${H - br}` : "", "Z",
+    ].join(" "));
+  };
+  new ResizeObserver(draw).observe(nav);
+  wide.addEventListener?.("change", draw);
+  draw();
+})();
 window.addEventListener("open-paper", (e) => { location.hash = `#/papers/${e.detail}`; });
 
 /* ---------- Top bar hairline once content scrolls under it ---------- */

@@ -129,11 +129,13 @@
   </main>
 
   <nav class="tabbar" aria-label="Main">
-    <span class="tab-indicator" aria-hidden="true"></span>
-    <a class="tab" href="#/home" data-tab="home"><i class="ph ph-house" aria-hidden="true"></i><span>Home</span></a>
-    <a class="tab" href="#/papers" data-tab="papers"><i class="ph ph-files" aria-hidden="true"></i><span>Papers</span></a>
-    <a class="tab" href="#/practice" data-tab="practice"><i class="ph ph-cards" aria-hidden="true"></i><span>Practice</span></a>
-    <a class="tab" href="#/repeated" data-tab="repeated"><i class="ph ph-repeat" aria-hidden="true"></i><span>Repeated</span></a>
+    <svg class="tabbar-bg" aria-hidden="true" focusable="false"><path /></svg>
+    <a class="tab" href="#/home" data-tab="home"><i class="ph ph-house" data-icon="house" aria-hidden="true"></i><span>Home</span></a>
+    <a class="tab" href="#/papers" data-tab="papers"><i class="ph ph-files" data-icon="files" aria-hidden="true"></i><span>Papers</span></a>
+    <span class="tab-gap" aria-hidden="true"></span>
+    <a class="tab" href="#/repeated" data-tab="repeated"><i class="ph ph-repeat" data-icon="repeat" aria-hidden="true"></i><span>Repeated</span></a>
+    <a class="tab" href="#/papers/search" data-tab="search"><i class="ph ph-magnifying-glass" data-icon="magnifying-glass" aria-hidden="true"></i><span>Search</span></a>
+    <a class="fab" href="#/practice" data-tab="practice" aria-label="Practice"><i class="ph ph-cards" aria-hidden="true"></i></a>
   </nav>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
