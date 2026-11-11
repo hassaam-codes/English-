@@ -21,6 +21,7 @@
 //
 // A long chapter can live in its own file under js/book/ and be imported here.
 import chapterQuestions from "./book/chapter-questions.js";
+import chapter11 from "./book/chapter-11-questions.js";
 import tenses from "./book/tenses.js";
 import pastTenses from "./book/past-tenses.js";
 import futureTenses from "./book/future-tenses.js";
@@ -30,7 +31,7 @@ export const ENGLISH_A = {
   name: "English A",
   label: "Textbook",
   about: "Every chapter of the book with its summary and question answers",
-  chapters: [...chapterQuestions],
+  chapters: [...chapterQuestions, chapter11],
 };
 
 export const ENGLISH_B = {
