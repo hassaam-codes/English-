@@ -274,12 +274,24 @@ mark { background: #ffe07a; color: #171717; border-radius: 3px; padding: 0 1px; 
 .empty p { margin: 8px 0 16px; }
 
 /* ---------- Practice deck ---------- */
-.deck { position: relative; height: clamp(212px, calc(100dvh - 352px - var(--safe-b)), 460px); margin: 4px 0 24px; perspective: 1200px; }
+/* Practice fills the window exactly (no page scroll): header, deck that takes the spare height, then the buttons. */
+html.is-practice main { padding-bottom: 0; }
+#view-practice:not([hidden]) {
+  display: flex; flex-direction: column;
+  height: calc(100vh - 56px - var(--tabbar-h) - 44px);
+  height: calc(100dvh - 56px - env(safe-area-inset-top, 0px) - var(--tabbar-h) - var(--safe-b) - 44px);
+  min-height: 400px;
+}
+#view-practice .view-head, #view-practice .meta-line, .deck-actions { flex: none; }
+/* The stack peeks 28px below the top card, so the buttons start well clear of it. */
+.deck { position: relative; flex: 1 1 auto; min-height: 0; max-height: 520px; margin: 4px 0 48px; perspective: 1200px; }
 @media (max-height: 640px) {
-  .fcard { padding: 16px 20px; }
+  .fcard { padding: 12px 20px; }
+  .fcard .f-body { min-height: 0; order: 2; }
+  .fcard .f-src { order: 1; margin-top: 2px; font-size: 12px; }
   .fcard .f-ask { display: none; }
   .fcard .f-body { padding: 8px 0; }
-  .fcard .f-body .ur { font-size: 21px; line-height: 2; }
+  .fcard .f-body .ur { font-size: 19px; line-height: 1.85; }
   .fcard .f-body .en { font-size: 20px; }
 }
 /* On phones the tab bar already says where you are, so the deck gets the title's space. */
@@ -406,6 +418,7 @@ mark { background: #ffe07a; color: #171717; border-radius: 3px; padding: 0 1px; 
   .view:not(#view-home) { max-width: 720px; margin: 0 auto; }
   .hero { grid-template-columns: 1fr 1fr; align-items: center; min-height: calc(100dvh - 56px - 120px); }
   .hero h1 { font-size: 60px; }
+  #view-practice:not([hidden]) { height: calc(100dvh - 56px - var(--tabbar-h) - 72px); }
   .preview { margin-top: 0; }
   .preview-stack { height: 300px; }
   .progress-card { max-width: 520px; }

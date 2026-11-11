@@ -478,6 +478,7 @@ function route() {
     }
   });
   window.scrollTo(0, 0);
+  document.documentElement.classList.toggle("is-practice", view === "practice");
   current = view;
   document.dispatchEvent(new CustomEvent("view-change", { detail: view }));
 }
