@@ -345,10 +345,24 @@ function cardHTML(it) {
 function flipTop() {
   const top = $('#deck .fcard[data-depth="0"]:not(.flying)');
   if (!top) return;
-  const on = top.classList.toggle("flipped");
-  top.querySelector(".f-front").setAttribute("aria-hidden", String(on));
-  top.querySelector(".f-back").setAttribute("aria-hidden", String(!on));
+  const inner = top.querySelector(".f-inner");
+  if (inner.dataset.busy) return;
+  const swap = () => {
+    const on = top.classList.toggle("flipped");
+    top.querySelector(".f-front").setAttribute("aria-hidden", String(on));
+    top.querySelector(".f-back").setAttribute("aria-hidden", String(!on));
+  };
   buzz(6);
+  if (reduceMotion) return swap();
+  // Turn edge-on, swap the visible face, turn back. Timers (not animation events) so it can never get stuck.
+  inner.dataset.busy = "1";
+  inner.classList.add("flip-out");
+  setTimeout(() => {
+    swap();
+    inner.classList.remove("flip-out");
+    inner.classList.add("flip-in");
+    setTimeout(() => { inner.classList.remove("flip-in"); delete inner.dataset.busy; }, 270);
+  }, 180);
 }
 function renderDeck() {
   const box = $("#deck");
