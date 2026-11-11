@@ -60,9 +60,21 @@ const safeParse = (s) => { try { return JSON.parse(s); } catch (e) { return null
 
 export default async function handler(req, res) {
   const fail = (status, error, code) => res.status(status).json({ error, code });
-  if (req.method !== "POST") { res.setHeader("Allow", "POST"); return fail(405, "Use POST."); }
+  // Opening /api/chat in a browser shows a small health report (never the key itself), to check the Vercel setup.
+  if (req.method === "GET") {
+    const k = process.env.NVIDIA_API_KEY || "";
+    return res.status(200).json({
+      keyFound: !!k,
+      keyLooksRight: k.trim().startsWith("nvapi-") && k === k.trim(),
+      environment: process.env.VERCEL_ENV || "unknown",
+      model: MODEL,
+      version: (process.env.VERCEL_GIT_COMMIT_SHA || "").slice(0, 7),
+      otherAiVariables: Object.keys(process.env).filter((n) => /nvidia|nvapi|anthropic|api_key/i.test(n) && n !== "NVIDIA_API_KEY"),
+    });
+  }
+  if (req.method !== "POST") { res.setHeader("Allow", "GET, POST"); return fail(405, "Use POST."); }
   if (!sameSite(req)) return fail(403, "This chat only works from the website.");
-  const key = process.env.NVIDIA_API_KEY;
+  const key = (process.env.NVIDIA_API_KEY || "").trim();
   if (!key) return fail(503, "The AI helper is not switched on yet.", "no_key");
 
   const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "unknown";
