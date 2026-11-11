@@ -11,8 +11,8 @@ import { INDEX, pick } from "./_knowledge.js";
 const BASE = process.env.AI_BASE_URL || "https://integrate.api.nvidia.com/v1";
 // NVIDIA retires models from time to time. If the chosen one is gone, the server asks NVIDIA which models
 // exist and moves to the first one from this list (best first), so the chat keeps working without a code change.
-const PREFERRED = [/^meta\/llama-4.*instruct/, /^meta\/llama-3\.[3-9].*70b-instruct/, /^openai\/gpt-oss-120b/, /^deepseek-ai\/deepseek-v3/, /^moonshotai\/kimi-k2/, /^qwen\/qwen3.*instruct/, /^mistralai\/mistral-(large|medium)/, /^meta\/llama-3\.1-405b-instruct/, /^meta\/llama-3\.1-70b-instruct/, /^google\/gemma-3-27b-it/, /^openai\/gpt-oss-20b/, /^meta\/llama-3\.1-8b-instruct/];
-let model = process.env.AI_MODEL || "meta/llama-3.3-70b-instruct";
+const PREFERRED = [/^minimaxai\/minimax-m[\d.]+-flash/, /^mistralai\/mistral-large-\d/, /^nvidia\/nemotron-[\d.]+-lightning/, /^z-ai\/glm-[\d.]+-flash/, /^deepseek-ai\/deepseek-v[\d.]+-flash/, /^google\/gemma-\d+-\d+b-it/, /^openai\/gpt-oss/, /^meta\/llama-\d.*instruct/];
+let model = process.env.AI_MODEL || "minimaxai/minimax-m3.1-flash";
 const dead = new Set();
 async function listModels(key) {
   const r = await fetch(`${BASE}/models`, { headers: { Authorization: `Bearer ${key}` } });
@@ -78,15 +78,6 @@ export default async function handler(req, res) {
   // Opening /api/chat in a browser shows a small health report (never the key itself), to check the Vercel setup.
   if (req.method === "GET") {
     const k = process.env.NVIDIA_API_KEY || "";
-    if (k && req.query && req.query.test) { // TEMP: try one model with a tiny question
-      const t0 = Date.now();
-      try {
-        const r = await fetch(`${BASE}/chat/completions`, { method: "POST", headers: { Authorization: `Bearer ${k.trim()}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ model: String(req.query.test), messages: [{ role: "system", content: "You are an English teacher for 9th class students in Pakistan. Be brief." }, { role: "user", content: "Translate into English and explain the tense in one line, in Urdu: \u0645\u06cc\u06ba \u0646\u0627\u0634\u062a\u06c1 \u06a9\u0631 \u0686\u06a9\u0627 \u06c1\u0648\u06ba\u06d4" }], max_tokens: 400, temperature: 0.3 }) });
-        const txt = await r.text();
-        return res.status(200).json({ model: req.query.test, status: r.status, ms: Date.now() - t0, body: txt.slice(0, 1500) });
-      } catch (e) { return res.status(200).json({ model: req.query.test, error: String(e), ms: Date.now() - t0 }); }
-    }
     return res.status(200).json({
       keyFound: !!k,
       keyLooksRight: k.trim().startsWith("nvapi-") && k === k.trim(),
@@ -110,7 +101,7 @@ export default async function handler(req, res) {
 
   // Find the notes for this question. The last two questions are used, so "explain it again" still finds its topic.
   const asked = messages.filter((m) => m.role === "user").slice(-2).map((m) => m.content).join("\n");
-  const notes = pick(asked) || "(Nothing in the notes matches this question.)";
+  const notes = pick(asked, 20000) || "(Nothing in the notes matches this question.)";
   const system = `${INSTRUCTIONS}\n\n<contents>\n${INDEX}\n</contents>\n\n<notes>\n${notes}\n</notes>`;
 
   const ctrl = new AbortController();
@@ -121,7 +112,7 @@ export default async function handler(req, res) {
     const call = () => fetch(`${BASE}/chat/completions`, {
       method: "POST", signal: ctrl.signal,
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", Accept: "text/event-stream" },
-      body: JSON.stringify({ model, messages: [{ role: "system", content: system }, ...messages], max_tokens: 1500, temperature: 0.3, stream: true }),
+      body: JSON.stringify({ model, messages: [{ role: "system", content: system }, ...messages], max_tokens: 4000, temperature: 0.3, stream: true }),
     });
     let up = await call();
     for (let tries = 0; tries < 4 && (up.status === 404 || up.status === 410); tries++) { // model retired or renamed
@@ -146,7 +137,7 @@ export default async function handler(req, res) {
     res.writeHead(200, { "Content-Type": "application/x-ndjson; charset=utf-8", "Cache-Control": "no-store", "X-Accel-Buffering": "no" });
     started = true;
     const dec = new TextDecoder();
-    let buf = "", cut = false;
+    let buf = "", cut = false, said = false;
     const take = (line) => {
       if (!line.startsWith("data:")) return;
       const data = line.slice(5).trim();
@@ -154,7 +145,7 @@ export default async function handler(req, res) {
       const ev = safeParse(data);
       const choice = ev && ev.choices && ev.choices[0];
       if (!choice) return;
-      if (choice.delta && typeof choice.delta.content === "string" && choice.delta.content) send({ t: choice.delta.content });
+      if (choice.delta && typeof choice.delta.content === "string" && choice.delta.content) { said = true; send({ t: choice.delta.content }); } // "thinking" text from the model is skipped
       if (choice.finish_reason === "length") cut = true;
     };
     for await (const chunk of up.body) {
@@ -164,7 +155,8 @@ export default async function handler(req, res) {
       lines.forEach((l) => take(l.trim()));
     }
     take(buf.trim());
-    if (cut) send({ t: "\n\n(The answer was cut short. Ask me to continue.)" });
+    if (!said) send({ error: "No answer came back. Try again." });
+    else if (cut) send({ t: "\n\n(The answer was cut short. Ask me to continue.)" });
     send({ done: true });
     res.end();
   } catch (err) {

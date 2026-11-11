@@ -75,6 +75,6 @@ which is given the parts of the site's notes that match the question (English A,
   `js/answers.js` and `js/book.js` into sections and picks the ones a question needs, so new chapters are known after the next deploy).
 - **The API key is never in the code.** In Vercel: Project → Settings → Environment Variables → add
   `NVIDIA_API_KEY` (the `nvapi-...` key) → Save → Redeploy.
-- Optional variable `AI_MODEL` picks the model (default `meta/llama-3.3-70b-instruct`; any chat model listed on build.nvidia.com).
+- Optional variable `AI_MODEL` picks the model (default `minimaxai/minimax-m3.1-flash`; if NVIDIA retires it the server moves to another available model by itself. Open `/api/chat?models` on the site to see what the key can use).
 - Limits built in: 20 questions per visitor per 10 minutes, 2,000 characters per question, requests only from the site itself.
 - The static preview (`python3 -m http.server`) has no `/api`, so the chat shows "not set up" there. Use `vercel dev` to try it locally.
