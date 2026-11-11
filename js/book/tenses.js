@@ -1,11 +1,12 @@
 // Copied word for word from the notes PDF "tenses" (12 pages), in the PDF's own order.
+// The chapter title was changed from "TENSES" to "PRESENT TENSES" at the owner's request.
 // Headings, numbering ("1.", "12:", or none), spellings and which line comes first are all as in the source.
 export default {
   "id": "tenses",
   "no": "",
-  "title": "TENSES",
+  "title": "PRESENT TENSES",
   "flow": true,
-  "pdf": "assets/notes/Tenses.pdf",
+  "pdf": "assets/notes/Present_Tenses.pdf",
   "sections": [
     {
       "title": "Use of \"It\"",
