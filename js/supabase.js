@@ -52,37 +52,71 @@ export async function uploadNote({ title, file }) {
 
 export const deleteNote = (note) => call(`/object/${NOTES_BUCKET}/${encodeURIComponent(note.file_path)}`, { method: "DELETE" });
 
-/* ---------- Books: Book A and Book B, one PDF each, in the "book" bucket. ----------
-   Files are named  a_<time>.pdf  and  b_<time>.pdf ; the newest of each letter is that book. */
+/* ---------- Books: Book A and Book B, in the "book" bucket. ----------
+   Supabase's free plan refuses any single file over 50 MB, so a bigger book is stored in pieces:
+     small book:  a_<time>.pdf
+     big book:    a_<time>.p1of3.pdf, a_<time>.p2of3.pdf, a_<time>.p3of3.pdf
+   The pieces are joined back together in the browser when the book is opened. */
+export const BOOK_PART_BYTES = 40 * 1024 * 1024;
 export const bookUrl = (name) => `${SUPABASE_URL}/storage/v1/object/public/${BOOK_BUCKET}/${encodeURIComponent(name)}`;
+const NAME = /^([ab])_(\d+)(?:\.p(\d+)of(\d+))?\.pdf$/;
 
 async function listBooks() {
   const rows = await call(`/object/list/${BOOK_BUCKET}`, {
     method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prefix: "", limit: 100, offset: 0, sortBy: { column: "created_at", order: "desc" } }),
+    body: JSON.stringify({ prefix: "", limit: 1000, offset: 0, sortBy: { column: "name", order: "asc" } }),
   });
-  return (rows || []).filter((r) => r.id && r.name && !r.name.startsWith("."));
+  return (rows || []).filter((r) => r.id && r.name && NAME.test(r.name));
 }
-const shape = (b) => (b ? { name: b.name, url: bookUrl(b.name), size: (b.metadata && b.metadata.size) || 0, created_at: b.created_at } : null);
+const del = (name) => call(`/object/${BOOK_BUCKET}/${encodeURIComponent(name)}`, { method: "DELETE" });
 
-// { a: {name,url,size,created_at} | null, b: ... }
+// The newest complete upload for one letter: { urls: [...], size, created_at, parts } or null
+function newest(rows, key) {
+  const sets = new Map(); // time -> { total, files: Map(partNo -> row) }
+  for (const r of rows) {
+    const [, k, time, no, of] = r.name.match(NAME);
+    if (k !== key) continue;
+    if (!sets.has(time)) sets.set(time, { total: +(of || 1), files: new Map() });
+    sets.get(time).files.set(+(no || 1), r);
+  }
+  const done = [...sets].filter(([, s]) => s.files.size === s.total).sort((x, y) => +y[0] - +x[0])[0];
+  if (!done) return null;
+  const files = [...done[1].files].sort((x, y) => x[0] - y[0]).map(([, r]) => r);
+  return {
+    urls: files.map((r) => bookUrl(r.name)), parts: files.length, time: done[0],
+    size: files.reduce((t, r) => t + ((r.metadata && r.metadata.size) || 0), 0), created_at: files[0].created_at,
+  };
+}
+
+// { a: {...} | null, b: {...} | null }
 export async function getBooks() {
-  const all = await listBooks();
-  return { a: shape(all.find((r) => r.name.startsWith("a_"))), b: shape(all.find((r) => r.name.startsWith("b_"))) };
+  const rows = await listBooks();
+  return { a: newest(rows, "a"), b: newest(rows, "b") };
 }
 
-export async function uploadBook(key, file) {
-  const name = `${key}_${Date.now()}.pdf`;
-  await call(`/object/${BOOK_BUCKET}/${name}`, {
-    method: "POST", body: file, headers: { "Content-Type": "application/pdf", "cache-control": "max-age=3600", "x-upsert": "false" },
-  });
-  // Remove older copies of this book so only the new one is kept
-  const old = (await listBooks().catch(() => [])).filter((r) => r.name.startsWith(`${key}_`) && r.name !== name);
-  await Promise.all(old.map((r) => call(`/object/${BOOK_BUCKET}/${encodeURIComponent(r.name)}`, { method: "DELETE" }).catch(() => {})));
-  return name;
+// onProgress(fractionDone) is called after each piece
+export async function uploadBook(key, file, onProgress = () => {}) {
+  const time = Date.now(), total = Math.max(1, Math.ceil(file.size / BOOK_PART_BYTES));
+  const headers = { "Content-Type": "application/pdf", "cache-control": "max-age=86400", "x-upsert": "false" };
+  const made = [];
+  try {
+    for (let i = 0; i < total; i++) {
+      const name = total === 1 ? `${key}_${time}.pdf` : `${key}_${time}.p${i + 1}of${total}.pdf`;
+      const piece = total === 1 ? file : file.slice(i * BOOK_PART_BYTES, (i + 1) * BOOK_PART_BYTES, "application/pdf");
+      await call(`/object/${BOOK_BUCKET}/${name}`, { method: "POST", body: piece, headers });
+      made.push(name);
+      onProgress((i + 1) / total);
+    }
+  } catch (e) {
+    await Promise.all(made.map((n) => del(n).catch(() => {}))); // don't leave half a book behind
+    throw e;
+  }
+  // Remove older uploads of this book
+  const old = (await listBooks().catch(() => [])).filter((r) => r.name.startsWith(`${key}_`) && !made.includes(r.name));
+  await Promise.all(old.map((r) => del(r.name).catch(() => {})));
 }
 
 export async function removeBook(key) {
   const mine = (await listBooks()).filter((r) => r.name.startsWith(`${key}_`));
-  await Promise.all(mine.map((r) => call(`/object/${BOOK_BUCKET}/${encodeURIComponent(r.name)}`, { method: "DELETE" })));
+  await Promise.all(mine.map((r) => del(r.name)));
 }

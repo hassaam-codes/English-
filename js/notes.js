@@ -118,7 +118,7 @@ $("#admin-notes").addEventListener("click", async (e) => {
 });
 
 /* ---------- Book A and Book B ---------- */
-const BOOK_MAX = 50 * 1024 * 1024;
+const BOOK_MAX = 400 * 1024 * 1024;
 const BOOK_NAME = { a: "Book A", b: "Book B" };
 const booksChanged = (books) => document.dispatchEvent(new CustomEvent("books-change", { detail: books }));
 const bookMissing = (e) => /bucket/i.test(e.message || "") || e.status === 404
@@ -131,7 +131,7 @@ async function loadBookStatus() {
     for (const f of forms) {
       const b = books[f.dataset.book];
       f.querySelector(".book-status").innerHTML = b
-        ? `Current file: <a href="${esc(b.url)}" target="_blank" rel="noopener">open it</a> · ${esc([size(b.size), day(b.created_at)].filter(Boolean).join(" · "))}` : "Nothing uploaded yet";
+        ? `Uploaded · ${esc([size(b.size), b.parts > 1 ? `stored in ${b.parts} pieces` : "", day(b.created_at)].filter(Boolean).join(" · "))}` : "Nothing uploaded yet";
       f.querySelector(".book-remove").hidden = !b;
     }
     return books;
@@ -150,11 +150,12 @@ document.querySelectorAll(".book-form").forEach((form) => {
     say(err, "");
     if (!file) return say(err, `Choose the ${name} PDF`);
     if (file.type !== "application/pdf") return say(err, "The book must be a PDF");
-    if (file.size > BOOK_MAX) return say(err, `That file is ${size(file.size)}. The limit is 50 MB`);
+    if (file.size > BOOK_MAX) return say(err, `That file is ${size(file.size)}. The limit is 400 MB`);
     busy(btn, true);
-    btn.querySelector("span").textContent = "Uploading, keep this page open";
+    const label = btn.querySelector("span");
+    label.textContent = "Uploading 0%, keep this page open";
     try {
-      await uploadBook(key, file);
+      await uploadBook(key, file, (f) => { label.textContent = `Uploading ${Math.round(f * 100)}%, keep this page open`; });
       form.reset();
       toast(`${name} uploaded`);
       booksChanged(await loadBookStatus());

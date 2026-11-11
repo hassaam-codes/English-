@@ -119,6 +119,8 @@ main { padding: 0 16px calc(var(--tabbar-h) + var(--safe-b) + 48px); max-width: 
 }
 .hub-row:nth-child(2) { --i: 1; } .hub-row:nth-child(3) { --i: 2; } .hub-row:nth-child(4) { --i: 3; } .hub-row:nth-child(5) { --i: 4; }
 .hub-row:hover { background: var(--raised); }
+button.hub-row { width: 100%; text-align: left; }
+button.hub-row:disabled { cursor: progress; }
 .hub-row.is-empty { background: transparent; border-style: dashed; }
 .hub-row.is-empty .hub-icon { background: var(--raised); color: var(--muted); }
 .hub-row.is-empty .hub-name { color: var(--text-2); }

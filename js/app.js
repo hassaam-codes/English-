@@ -470,23 +470,62 @@ function route() {
   document.dispatchEvent(new CustomEvent("view-change", { detail: view }));
 }
 // Books page (round button): Book A and Book B, uploaded from the admin page.
+// A small book is one file and opens directly. A big book is stored in pieces: tapping it downloads the
+// pieces, joins them, and then offers the finished PDF to open.
 (() => {
   const KEY = "lb9-books", box = $("#book-list");
-  const row = (name, sub, b) => (b
-    ? `<a class="hub-row" href="${esc(b.url)}" target="_blank" rel="noopener"><span class="hub-icon"><i class="ph ph-file-pdf" aria-hidden="true"></i></span><span><span class="hub-name">${name}</span><span class="hub-sub">${sub} · PDF</span></span><i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>`
-    : `<div class="hub-row is-empty"><span class="hub-icon"><i class="ph ph-hourglass" aria-hidden="true"></i></span><span><span class="hub-name">${name}</span><span class="hub-sub">${sub} · being added</span></span><span></span></div>`);
-  const show = (books) => {
-    const bk = books || {};
-    box.innerHTML = row("Book A", "Textbook", bk.a || (BOOK_PDF ? { url: BOOK_PDF } : null)) + row("Book B", "Grammar", bk.b);
+  const INFO = { a: ["Book A", "Textbook"], b: ["Book B", "Grammar"] };
+  const ready = {};   // key -> { time, url } joined PDFs, kept while the page is open
+  let books = {};
+  const mb = (n) => (n ? `${Math.max(1, Math.round(n / 1048576))} MB` : "");
+  const rowHTML = (key) => {
+    const [name, sub] = INFO[key];
+    let b = books[key];
+    if (!b && key === "a" && BOOK_PDF) b = { urls: [BOOK_PDF], parts: 1 };
+    if (!b) return `<div class="hub-row is-empty"><span class="hub-icon"><i class="ph ph-hourglass" aria-hidden="true"></i></span><span><span class="hub-name">${name}</span><span class="hub-sub">${sub} · being added</span></span><span></span></div>`;
+    const done = ready[key] && ready[key].time === b.time ? ready[key].url : b.parts === 1 ? b.urls[0] : null;
+    if (done) return `<a class="hub-row" href="${esc(done)}" target="_blank" rel="noopener"><span class="hub-icon"><i class="ph ph-file-pdf" aria-hidden="true"></i></span><span><span class="hub-name">${name}</span><span class="hub-sub">${b.parts > 1 ? "Ready · tap to open" : `${sub} · PDF`}</span></span><i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>`;
+    return `<button class="hub-row" type="button" data-load="${key}"><span class="hub-icon"><i class="ph ph-file-pdf" aria-hidden="true"></i></span><span><span class="hub-name">${name}</span><span class="hub-sub">${sub} · PDF${b.size ? ` · ${mb(b.size)}` : ""} · tap to load</span></span><i class="ph ph-download-simple" aria-hidden="true"></i></button>`;
   };
-  const remember = (books) => { try { localStorage.setItem(KEY, JSON.stringify(books || {})); } catch (e) {} };
-  let saved = null;
-  try { saved = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) {}
-  show(saved);                                    // instant, from the last visit
-  const refresh = () => { if (configured()) getBooks().then((b) => { remember(b); show(b); }).catch(() => {}); };
+  const show = () => { box.innerHTML = rowHTML("a") + rowHTML("b"); };
+
+  box.addEventListener("click", async (e) => {
+    const btn = e.target.closest("[data-load]");
+    if (!btn || btn.disabled) return;
+    const key = btn.dataset.load, b = books[key], sub = btn.querySelector(".hub-sub");
+    btn.disabled = true;
+    try {
+      const pieces = [];
+      let got = 0;
+      for (const url of b.urls) {
+        const res = await fetch(url);
+        if (!res.ok || !res.body) throw new Error("download failed");
+        const reader = res.body.getReader();
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          pieces.push(value); got += value.length;
+          sub.textContent = `Loading ${b.size ? Math.min(99, Math.round((got / b.size) * 100)) + "%" : mb(got)}`;
+        }
+      }
+      if (ready[key]) URL.revokeObjectURL(ready[key].url);
+      ready[key] = { time: b.time, url: URL.createObjectURL(new Blob(pieces, { type: "application/pdf" })) };
+      show();
+      toast(`${INFO[key][0]} is ready, tap it to open`);
+    } catch (err) {
+      btn.disabled = false;
+      sub.textContent = "Could not load. Check your connection and tap to try again";
+    }
+  });
+
+  const remember = () => { try { localStorage.setItem(KEY, JSON.stringify(books)); } catch (e) {} };
+  try { books = JSON.parse(localStorage.getItem(KEY) || "null") || {}; } catch (e) {}
+  if (books.a && !books.a.urls) books = {};      // older saved format
+  show();                                         // instant, from the last visit
+  const refresh = () => { if (configured()) getBooks().then((b) => { books = b || {}; remember(); show(); }).catch(() => {}); };
   refresh();
   document.addEventListener("view-change", (e) => { if (e.detail === "book") refresh(); });
-  document.addEventListener("books-change", (e) => { remember(e.detail); show(e.detail); });
+  document.addEventListener("books-change", (e) => { books = e.detail || {}; remember(); show(); });
 })();
 window.addEventListener("hashchange", route);
 document.querySelectorAll(".tab, .fab").forEach((t) => t.addEventListener("click", () => buzz()));

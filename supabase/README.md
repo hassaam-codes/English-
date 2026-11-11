@@ -33,12 +33,15 @@ If notes are ever tampered with, change the password in `js/config.js`; for a re
 ## Books (round button)
 
 The round button in the bottom bar opens a **Books** page with **Book A** and **Book B**.
-In the admin page there is a section for each: choose the PDF (up to 50 MB) and press **Upload**.
-It then opens for everyone. Uploading again replaces that book; **Remove** deletes it. The other book is not touched.
+In the admin page there is a section for each: choose the PDF (up to 400 MB) and press **Upload**.
+Uploading again replaces that book; **Remove** deletes it. The other book is not touched.
 
-One-time setup: run [`book.sql`](book.sql) in the Supabase SQL Editor. It creates a separate `book` bucket
-(PDF only, 50 MB per file, which is the free plan's limit). If a book is bigger than that, share it from
-Google Drive instead and ask for the link to be set in the code.
+One-time setup: run [`book.sql`](book.sql) in the Supabase SQL Editor. It creates a separate `book` bucket.
+
+**Big books.** Supabase's free plan refuses any single file over 50 MB. A bigger book is therefore cut into
+40 MB pieces when uploaded and joined back together in the student's browser when opened. For students this
+means a big book shows "tap to load", downloads with a percentage, then says "Ready · tap to open".
+A book under 40 MB is one file and opens straight away, so a smaller (compressed) PDF gives a better experience.
 
 ## Editing content
 
