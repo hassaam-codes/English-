@@ -1,6 +1,6 @@
 // Public Notes page and the admin panel (sign in, upload, delete).
 import { ADMIN_USERNAME, ADMIN_PASSWORD } from "./config.js";
-import { configured, listNotes, uploadNote, deleteNote, publicUrl } from "./supabase.js";
+import { configured, listNotes, uploadNote, deleteNote, publicUrl, getBook, uploadBook, removeBook } from "./supabase.js";
 
 // Simple lock: the username and password live in config.js and are checked here in the browser.
 const SIGNED_IN = "lb9-admin";
@@ -54,7 +54,7 @@ function showAdmin() {
   $("#admin-login").hidden = !ready || !!user;
   $("#admin-panel").hidden = !user;
   $("#admin-signout").hidden = !user;
-  if (user) loadAdminNotes();
+  if (user) { loadAdminNotes(); loadBookStatus(); }
 }
 
 async function loadAdminNotes() {
@@ -115,6 +115,46 @@ $("#admin-notes").addEventListener("click", async (e) => {
   b.disabled = true;
   try { await deleteNote(note); toast("Deleted"); await loadAdminNotes(); }
   catch (ex) { b.disabled = false; toast(ex.message || "Could not delete"); }
+});
+
+/* ---------- Book PDF ---------- */
+const BOOK_MAX = 50 * 1024 * 1024;
+const bookChanged = (book) => document.dispatchEvent(new CustomEvent("book-change", { detail: book }));
+const bookMissing = (e) => /bucket/i.test(e.message || "") || e.status === 404
+  ? "Book storage is not set up yet. Run supabase/book.sql in Supabase first" : e.message || "Something went wrong. Try again";
+
+async function loadBookStatus() {
+  const st = $("#book-status"), rm = $("#book-remove");
+  try {
+    const b = await getBook();
+    st.innerHTML = b ? `Current book: <a href="${esc(b.url)}" target="_blank" rel="noopener">open it</a> · ${esc([size(b.size), day(b.created_at)].filter(Boolean).join(" · "))}` : "No book uploaded yet";
+    rm.hidden = !b;
+  } catch (e) { st.textContent = bookMissing(e); rm.hidden = true; }
+}
+
+$("#book-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const file = $("#book-file").files[0], err = $("#book-error"), btn = $("#book-btn");
+  say(err, "");
+  if (!file) return say(err, "Choose the book PDF");
+  if (file.type !== "application/pdf") return say(err, "The book must be a PDF");
+  if (file.size > BOOK_MAX) return say(err, `That file is ${size(file.size)}. The limit is 50 MB`);
+  busy(btn, true);
+  btn.querySelector("span").textContent = "Uploading, keep this page open";
+  try {
+    await uploadBook(file);
+    e.target.reset();
+    toast("Book uploaded");
+    await loadBookStatus();
+    bookChanged(await getBook().catch(() => null));
+  } catch (ex) { say(err, bookMissing(ex)); }
+  finally { busy(btn, false); btn.querySelector("span").textContent = "Upload book"; }
+});
+
+$("#book-remove").addEventListener("click", async () => {
+  if (!confirm("Remove the book? The Book button will have nothing to open.")) return;
+  try { await removeBook(); toast("Book removed"); await loadBookStatus(); bookChanged(null); }
+  catch (ex) { toast(bookMissing(ex)); }
 });
 
 document.addEventListener("view-change", (e) => {

@@ -1,6 +1,6 @@
 // Notes storage: files live in one public Supabase Storage bucket. No tables, no accounts.
 // The note's title is kept inside the file's name, so nothing else needs to be stored.
-import { SUPABASE_URL, SUPABASE_KEY, NOTES_BUCKET } from "./config.js";
+import { SUPABASE_URL, SUPABASE_KEY, NOTES_BUCKET, BOOK_BUCKET } from "./config.js";
 
 export const configured = () => !!(SUPABASE_URL && SUPABASE_KEY);
 
@@ -51,3 +51,36 @@ export async function uploadNote({ title, file }) {
 }
 
 export const deleteNote = (note) => call(`/object/${NOTES_BUCKET}/${encodeURIComponent(note.file_path)}`, { method: "DELETE" });
+
+/* ---------- Book: one PDF in its own bucket. The newest file is the book. ---------- */
+export const bookUrl = (name) => `${SUPABASE_URL}/storage/v1/object/public/${BOOK_BUCKET}/${encodeURIComponent(name)}`;
+
+async function listBook() {
+  const rows = await call(`/object/list/${BOOK_BUCKET}`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prefix: "", limit: 100, offset: 0, sortBy: { column: "created_at", order: "desc" } }),
+  });
+  return (rows || []).filter((r) => r.id && r.name && !r.name.startsWith("."));
+}
+
+// { name, url, size, created_at } or null
+export async function getBook() {
+  const [b] = await listBook();
+  return b ? { name: b.name, url: bookUrl(b.name), size: (b.metadata && b.metadata.size) || 0, created_at: b.created_at } : null;
+}
+
+export async function uploadBook(file) {
+  const name = `${Date.now()}_book.pdf`;
+  await call(`/object/${BOOK_BUCKET}/${name}`, {
+    method: "POST", body: file, headers: { "Content-Type": "application/pdf", "cache-control": "max-age=3600", "x-upsert": "false" },
+  });
+  // Remove older copies so only the new book is kept
+  const old = (await listBook().catch(() => [])).filter((r) => r.name !== name);
+  await Promise.all(old.map((r) => call(`/object/${BOOK_BUCKET}/${encodeURIComponent(r.name)}`, { method: "DELETE" }).catch(() => {})));
+  return name;
+}
+
+export async function removeBook() {
+  const all = await listBook();
+  await Promise.all(all.map((r) => call(`/object/${BOOK_BUCKET}/${encodeURIComponent(r.name)}`, { method: "DELETE" })));
+}

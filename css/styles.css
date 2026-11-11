@@ -461,6 +461,8 @@ a.note:active { transform: scale(0.99); }
 .field-help { margin: 0; font-size: 13px; color: var(--muted); }
 .form-error { margin: 0; padding: 10px 12px; border-radius: 10px; font-size: 14px; color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); }
 .form .btn { justify-self: start; }
+.form-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.panel-text a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .btn[aria-busy="true"] { opacity: 0.7; pointer-events: none; }
 
 /* ---------- Tab bar (bottom navigation with centre notch) ---------- */

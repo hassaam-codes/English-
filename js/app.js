@@ -1,6 +1,7 @@
 import { ROMAN } from "./data.js";
 import { loadContent } from "./content.js";
 import { BOOK_PDF } from "./config.js";
+import { configured, getBook } from "./supabase.js";
 import "./library.js"; // English A and English B
 import "./notes.js"; // Notes page and admin panel (listen for the view-change event)
 
@@ -468,11 +469,20 @@ function route() {
   current = view;
   document.dispatchEvent(new CustomEvent("view-change", { detail: view }));
 }
-// Round button: opens the textbook PDF directly once one is set in config.js
-if (BOOK_PDF) {
-  const fab = $(".fab");
-  fab.href = BOOK_PDF; fab.target = "_blank"; fab.rel = "noopener";
-}
+// Round button: opens the uploaded book PDF (or the fallback in config.js). With no book it opens the Book page.
+(() => {
+  const fab = $(".fab"), KEY = "lb9-book-url";
+  const point = (url) => {
+    if (url) { fab.href = url; fab.target = "_blank"; fab.rel = "noopener"; }
+    else { fab.href = "#/book"; fab.removeAttribute("target"); fab.removeAttribute("rel"); }
+  };
+  const remember = (url) => { try { url ? localStorage.setItem(KEY, url) : localStorage.removeItem(KEY); } catch (e) {} };
+  let saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  point(saved || BOOK_PDF);                       // instant, from the last visit
+  if (configured()) getBook().then((b) => { remember(b && b.url); point((b && b.url) || BOOK_PDF); }).catch(() => {});
+  document.addEventListener("book-change", (e) => { const u = e.detail && e.detail.url; remember(u); point(u || BOOK_PDF); });
+})();
 window.addEventListener("hashchange", route);
 document.querySelectorAll(".tab, .fab").forEach((t) => t.addEventListener("click", () => buzz()));
 function syncTabs(active) {

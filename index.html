@@ -177,6 +177,20 @@
       </form>
 
       <div id="admin-panel" hidden>
+        <form class="panel form" id="book-form" novalidate>
+          <p class="panel-title">Book PDF</p>
+          <p class="panel-text" id="book-status">Checking</p>
+          <div class="field">
+            <label for="book-file">File</label>
+            <input id="book-file" name="file" type="file" accept="application/pdf" required />
+            <p class="field-help">One PDF, up to 50 MB. Uploading a new one replaces the old one</p>
+          </div>
+          <p class="form-error" id="book-error" role="alert" hidden></p>
+          <div class="form-row">
+            <button class="btn btn-primary" type="submit" id="book-btn"><i class="ph ph-upload-simple" aria-hidden="true"></i><span>Upload book</span></button>
+            <button class="btn btn-ghost" type="button" id="book-remove" hidden>Remove</button>
+          </div>
+        </form>
         <form class="panel form" id="upload-form" novalidate>
           <p class="panel-title">Upload notes</p>
           <div class="field">

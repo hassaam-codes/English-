@@ -15,5 +15,7 @@ export const ADMIN_PASSWORD = "admin1221";
 export const NOTES_BUCKET = "notes"; // Supabase Storage bucket that holds the uploaded files
 
 // The textbook PDF opened by the round button in the bottom bar.
-// Put the file in assets/book/ and set its path here, e.g. "assets/book/English_9.pdf".
+// Normally it is uploaded from the admin page (stored in the "book" bucket, see supabase/book.sql).
+// This is a fallback used only when nothing has been uploaded: a file path or a link.
 export const BOOK_PDF = "";
+export const BOOK_BUCKET = "book";
