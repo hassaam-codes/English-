@@ -61,6 +61,12 @@
     <section class="view" id="view-a" data-view="a" hidden aria-label="English A"></section>
     <section class="view" id="view-b" data-view="b" hidden aria-label="English B"></section>
 
+    <!-- BOOK: shown only until the textbook PDF is added (then the round button opens the PDF itself) -->
+    <section class="view" id="view-book" data-view="book" hidden aria-label="Book">
+      <div class="view-head"><h2 class="view-title">Book</h2></div>
+      <div class="empty"><i class="ph ph-book-bookmark" aria-hidden="true"></i><p>The book PDF is being added</p></div>
+    </section>
+
     <!-- PAPERS -->
     <section class="view" id="view-papers" data-view="papers" hidden aria-label="Papers">
       <div class="view-head">
@@ -68,6 +74,11 @@
           <h2 class="view-title">Papers</h2>
           <a class="icon-btn" href="assets/English_Papers_2022-2026.pdf" download aria-label="Download PDF"><i class="ph ph-download-simple" aria-hidden="true"></i></a>
         </div>
+        <a class="quiz-link" href="#/practice">
+          <span class="hub-icon"><i class="ph ph-cards" aria-hidden="true"></i></span>
+          <span><span class="hub-name">Quiz</span><span class="hub-sub">Flashcards from these papers, tap for the answer</span></span>
+          <i class="ph ph-caret-right" aria-hidden="true"></i>
+        </a>
         <label class="search">
           <span class="sr-only">Search all papers</span>
           <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
@@ -94,9 +105,10 @@
     </section>
 
     <!-- PRACTICE -->
-    <section class="view" id="view-practice" data-view="practice" hidden aria-label="Practice">
+    <section class="view" id="view-practice" data-view="practice" hidden aria-label="Quiz">
       <div class="view-head">
-        <h2 class="view-title">Practice</h2>
+        <a class="back" href="#/papers"><i class="ph ph-arrow-left" aria-hidden="true"></i>Papers</a>
+        <h2 class="view-title">Quiz</h2>
         <div class="segmented" id="deck-filter" aria-label="Choose questions">
           <button type="button" data-deck="q8">Q.8</button>
           <button type="button" data-deck="q9">Q.9</button>
@@ -192,7 +204,7 @@
     <span class="tab-gap" aria-hidden="true"></span>
     <a class="tab" href="#/b" data-tab="b"><i class="ph ph-text-aa" data-icon="text-aa" aria-hidden="true"></i><span>English B</span></a>
     <a class="tab" href="#/papers" data-tab="papers"><i class="ph ph-files" data-icon="files" aria-hidden="true"></i><span>Papers</span></a>
-    <a class="fab" href="#/practice" data-tab="practice" aria-label="Practice"><i class="ph ph-cards" aria-hidden="true"></i></a>
+    <a class="fab" href="#/book" data-tab="book" aria-label="Book PDF"><i class="ph ph-book-bookmark" aria-hidden="true"></i></a>
   </nav>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>

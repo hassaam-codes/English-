@@ -13,3 +13,7 @@ export const PAPERS_FROM_DATABASE = false;
 export const ADMIN_USERNAME = "admin";
 export const ADMIN_PASSWORD = "admin1221";
 export const NOTES_BUCKET = "notes"; // Supabase Storage bucket that holds the uploaded files
+
+// The textbook PDF opened by the round button in the bottom bar.
+// Put the file in assets/book/ and set its path here, e.g. "assets/book/English_9.pdf".
+export const BOOK_PDF = "";

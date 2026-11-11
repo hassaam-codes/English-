@@ -1,5 +1,6 @@
 import { ROMAN } from "./data.js";
 import { loadContent } from "./content.js";
+import { BOOK_PDF } from "./config.js";
 import "./library.js"; // English A and English B
 import "./notes.js"; // Notes page and admin panel (listen for the view-change event)
 
@@ -427,7 +428,7 @@ $("#rep-list").addEventListener("click", (e) => {
 });
 
 /* ---------- Router + tab bar ---------- */
-const ORDER = ["home", "a", "practice", "b", "papers", "repeated", "notes", "admin"];
+const ORDER = ["home", "a", "book", "b", "papers", "practice", "repeated", "notes", "admin"];
 let current = null;
 function writeHash() {
   const h = `#/papers/${PAPERS[paperState.idx].id}/${paperState.section}`;
@@ -445,7 +446,7 @@ function route() {
     if (pid && pid !== "search" && paperState.q) { paperState.q = ""; $("#search").value = ""; renderSearch(); }
     if (changed || current !== "papers") renderPaper(current === "papers" ? dir : 0);
   }
-  syncTabs(view === "papers" && pid === "search" ? "search" : view);
+  syncTabs(view === "practice" ? "papers" : view); // the quiz lives inside Papers
   if (view === "papers" && pid === "search") {
     if (paperState.q) { renderSearch(); }
     requestAnimationFrame(() => { $("#search").focus({ preventScroll: true }); });
@@ -466,6 +467,11 @@ function route() {
   document.documentElement.classList.toggle("is-home", view === "home");
   current = view;
   document.dispatchEvent(new CustomEvent("view-change", { detail: view }));
+}
+// Round button: opens the textbook PDF directly once one is set in config.js
+if (BOOK_PDF) {
+  const fab = $(".fab");
+  fab.href = BOOK_PDF; fab.target = "_blank"; fab.rel = "noopener";
 }
 window.addEventListener("hashchange", route);
 document.querySelectorAll(".tab, .fab").forEach((t) => t.addEventListener("click", () => buzz()));

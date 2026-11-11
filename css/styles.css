@@ -87,7 +87,7 @@ main { padding: 0 16px calc(var(--tabbar-h) + var(--safe-b) + 48px); max-width: 
 @keyframes view-in-right { from { opacity: 0; transform: translateX(24px); } }
 
 .view-head { padding: 12px 0 16px; display: grid; gap: 12px; }
-#view-practice .view-head { padding-bottom: 8px; }
+#view-practice .view-head { padding-bottom: 8px; gap: 8px; }
 .view-title { font-size: 28px; line-height: 1.15; font-weight: 500; letter-spacing: -0.02em; margin: 0; }
 .view-lead { margin: 0; color: var(--text-2); font-size: 15px; }
 .view-lead strong { color: var(--text); font-weight: 500; }
@@ -176,6 +176,14 @@ a.chip { display: inline-flex; align-items: center; }
 
 
 .view-title-row { display: flex; align-items: center; justify-content: space-between; }
+.quiz-link {
+  display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 12px; padding: 12px 12px 12px 14px;
+  border-radius: 18px; background: var(--card); border: 1px solid var(--line);
+  transition: background-color 150ms var(--ease), transform 150ms var(--ease);
+}
+.quiz-link:hover { background: var(--raised); }
+.quiz-link:active { transform: scale(0.99); }
+.quiz-link > i { font-size: 18px; color: var(--muted); }
 .alp {
   display: inline-block; align-self: flex-start; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px;
   background: var(--alp-bg); color: var(--alp-ink); white-space: nowrap;
@@ -307,8 +315,12 @@ html.is-practice main { padding-bottom: 0; }
   .fcard .f-foot { order: 1; margin-top: 2px; }
   .fcard .f-src { font-size: 12px; }
   .fcard .f-ask { display: none; }
+  #view-practice .meta-line { display: none; }
+  #view-practice .view-head { padding-top: 0; }
+  .deck { margin-bottom: 44px; }
   .fcard .f-body { padding: 8px 0; }
-  .fcard .f-body .ur { font-size: 19px; line-height: 1.85; }
+  .fcard .f-body .ur { font-size: 18px; line-height: 1.7; }
+  .fcard .f-body { align-items: start; padding-top: 6px !important; }
   .fcard .f-body .en { font-size: 20px; }
 }
 /* On phones the tab bar already says where you are, so the deck gets the title's space. */

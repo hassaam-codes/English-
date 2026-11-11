@@ -11,7 +11,8 @@ A 9th class English site, built mobile first like an app.
 - **English A (textbook):** chapters, each with its summary, question answers and other sections. Content lives in `js/book.js` and is copied word for word from the notes PDFs.
 - **English B (grammar):** grammar topics, in the same format.
 - **Past papers:** the ten Lahore Board papers 2022 to 2026 (Q.8 and Q.9) with suggested answers; swipe between papers, search in English or Urdu, tick what you have practised.
-- **Practice (round button):** flashcards for Q.8, Q.9 or only repeated questions. Tap to flip for the answer, swipe right if you know it.
+- **Quiz (inside Past papers):** flashcards for Q.8, Q.9 or only repeated questions. Tap to flip for the answer, swipe right if you know it.
+- **Book (round button):** opens the textbook PDF. Put the file in `assets/book/` and set `BOOK_PDF` in `js/config.js`; until then the button shows a 'being added' page.
 - **Repeated questions:** every question asked in more than one paper.
 - **Notes:** files uploaded from the admin page (`/#/admin`).
 - Light and dark themes, reduced-motion support, a designed PDF of the papers.
