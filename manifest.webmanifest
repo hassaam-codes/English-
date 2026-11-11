@@ -1,0 +1,13 @@
+{
+  "name": "9th English Past Papers",
+  "short_name": "English Papers",
+  "description": "9th Class English, Lahore Board past papers 2022 to 2026. Practise Q.8 translation and Q.9 change the voice.",
+  "start_url": "./#/home",
+  "display": "standalone",
+  "background_color": "#fafafa",
+  "theme_color": "#1d4ed8",
+  "icons": [
+    { "src": "assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

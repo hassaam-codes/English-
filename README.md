@@ -23,6 +23,11 @@ python3 -m http.server 8000
 ## Deploy
 Upload the folder as-is to GitHub Pages, Netlify or Vercel (static site, no framework).
 
+## Logo
+- `assets/logo.svg`: the mark (a sheet of paper with a folded corner and a 9)
+- `assets/icons/`: browser tab icon and phone home-screen icons
+- `manifest.webmanifest`: lets people add the site to their phone's home screen
+
 ## Files
 - `index.html`: page structure
 - `css/styles.css`: design tokens, layout, motion

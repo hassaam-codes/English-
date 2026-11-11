@@ -8,6 +8,11 @@
   <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#141415" media="(prefers-color-scheme: dark)" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="English Papers" />
+  <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="assets/icons/favicon-32.png" sizes="32x32" type="image/png" />
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png" />
+  <link rel="manifest" href="manifest.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet" />
@@ -21,7 +26,14 @@
 <body>
   <header class="topbar">
     <a class="brand" href="#/home" aria-label="Home">
-      <span class="brand-mark">9</span>
+      <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <path class="bm-sheet" d="M14 0h30l20 20v30a14 14 0 0 1-14 14H14A14 14 0 0 1 0 50V14A14 14 0 0 1 14 0z"/>
+        <path class="bm-fold" d="M44 0v12a8 8 0 0 0 8 8h12z"/>
+        <g class="bm-nine" fill="none" stroke-width="7.5" stroke-linecap="round">
+          <circle cx="29" cy="28" r="9.75"/>
+          <path d="M38.75 28v8c0 10-6.5 15.75-16.5 15.75"/>
+        </g>
+      </svg>
       <span class="brand-text">English Papers</span>
     </a>
     <div class="topbar-actions">

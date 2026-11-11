@@ -61,10 +61,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 .topbar.scrolled { border-bottom-color: var(--line); }
 .brand { display: flex; align-items: center; gap: 10px; }
-.brand-mark {
-  width: 32px; height: 32px; border-radius: 10px; display: grid; place-items: center;
-  background: var(--accent); color: var(--accent-ink); font-family: var(--mono); font-weight: 500;
-}
+.brand-mark { width: 32px; height: 32px; flex: none; display: block; }
+.bm-sheet { fill: var(--accent); }
+.bm-fold { fill: color-mix(in srgb, var(--accent) 50%, var(--bg)); }
+.bm-nine { stroke: var(--accent-ink); }
 .brand-text { font-weight: 500; font-size: 16px; }
 .topbar-actions { display: flex; gap: 4px; }
 .icon-btn {
