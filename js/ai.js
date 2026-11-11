@@ -13,6 +13,7 @@ const STARTERS = [
 ];
 
 let chat = [];        // [{ role: "user" | "assistant", content, error? }]
+let fresh = 0;       // how many bubbles have already been shown (these do not animate again)
 let busy = null;      // AbortController while an answer is arriving
 try { const saved = JSON.parse(sessionStorage.getItem(KEY) || "null"); if (saved && Array.isArray(saved.chat)) { chat = saved.chat; } } catch (e) {}
 const remember = () => { try { sessionStorage.setItem(KEY, JSON.stringify({ chat: chat.filter((m) => !m.error) })); } catch (e) {} };
@@ -60,13 +61,20 @@ function draw() {
     return;
   }
   log.innerHTML = chat.map(bubble).join("");
+  [...log.children].forEach((el, i) => { if (i < fresh) el.classList.add("is-old"); }); // only new bubbles slide in
+  fresh = chat.length;
   log.scrollTop = log.scrollHeight;
 }
+// Updates the newest bubble in place. The element is kept (only its contents change), so nothing flashes while text streams in.
 function redrawLast() {
   const last = log.lastElementChild, m = chat[chat.length - 1];
-  if (!last || !m) return;
+  if (!last || !m || !last.classList.contains("ai-msg")) return draw();
   const stick = log.scrollHeight - log.scrollTop - log.clientHeight < 80; // only follow the text if the reader is at the bottom
-  last.outerHTML = bubble(m, chat.length - 1);
+  const tmp = document.createElement("div");
+  tmp.innerHTML = bubble(m, chat.length - 1);
+  const next = tmp.firstElementChild;
+  last.className = `${next.className} is-old`;
+  last.innerHTML = next.innerHTML;
   if (stick) log.scrollTop = log.scrollHeight;
 }
 function setBusy(ctrl) {
@@ -128,7 +136,8 @@ async function ask(text) {
   }
   if (frame) { cancelAnimationFrame(frame); frame = 0; }
   setBusy(null);
-  draw();
+  if (chat[chat.length - 1] === reply) redrawLast(); else { fresh = Math.min(fresh, chat.length); draw(); }
+  newBtn.hidden = !chat.length;
   remember();
 }
 
@@ -151,7 +160,7 @@ log.addEventListener("click", (e) => {
   if (s) return ask(s.dataset.ask);
   if (e.target.closest("[data-retry]")) ask("");
 });
-newBtn.addEventListener("click", () => { if (busy) busy.abort(); chat = []; draw(); remember(); input.focus(); });
+newBtn.addEventListener("click", () => { if (busy) busy.abort(); chat = []; fresh = 0; draw(); remember(); input.focus(); });
 
 document.addEventListener("view-change", (e) => {
   if (e.detail !== "ai") return;

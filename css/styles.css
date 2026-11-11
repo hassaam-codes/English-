@@ -599,6 +599,7 @@ html.is-ai main { padding-bottom: 0; }
 .ai-starter:active { transform: scale(0.99); }
 .ai-starter i { flex: none; color: var(--muted); font-size: 16px; }
 .ai-msg { max-width: 100%; font-size: 16px; line-height: 1.6; overflow-wrap: anywhere; animation: view-in 280ms var(--ease) both; }
+.ai-msg.is-old { animation: none; }
 .ai-msg p, .ai-msg ul, .ai-msg ol { margin: 0 0 10px; }
 .ai-msg > :last-child { margin-bottom: 0; }
 .ai-msg ul, .ai-msg ol { padding-inline-start: 22px; display: grid; gap: 4px; }
