@@ -1,5 +1,6 @@
 import { ROMAN } from "./data.js";
 import { loadContent } from "./content.js";
+import "./notes.js"; // Notes page and admin panel (listen for the view-change event)
 
 // Content comes from Supabase when it is set up, otherwise from the copy built into the site.
 const { COVER, PAPERS, REPEATED, Q8_HEADING, Q9_HEADING, ALT_HEADING, ANSWERS, source: CONTENT_SOURCE } = await loadContent();
@@ -426,7 +427,7 @@ $("#rep-list").addEventListener("click", (e) => {
 });
 
 /* ---------- Router + tab bar ---------- */
-const ORDER = ["home", "papers", "practice", "repeated"];
+const ORDER = ["home", "papers", "practice", "repeated", "notes", "admin"];
 let current = null;
 function writeHash() {
   const h = `#/papers/${PAPERS[paperState.idx].id}/${paperState.section}`;

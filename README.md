@@ -11,6 +11,8 @@ Built mobile first, like an app, with a bottom tab bar:
 - **Practice:** a flashcard deck for Q.8, Q.9 or only repeated questions. Tap a card to flip it and see the answer. Swipe right if you can do it, left to see it again later.
 - **Answers:** suggested answers live in `js/answers.js` (they are not from the board or the source PDF). In Papers, tap a sentence to show its answer.
 - **Repeated:** every repeated question with how many times it came, each paper tappable.
+- **Notes:** PDFs and images uploaded by the admin, listed for students to open.
+- **Admin (`/#/admin`):** sign in to upload and delete notes. Needs Supabase; see `supabase/README.md`.
 - Progress is saved on the device. Light and dark themes, reduced-motion support, PDF download.
 
 ## Run locally
@@ -44,3 +46,5 @@ Content can be served from Supabase (read-only for the public). See [`supabase/R
 - `js/app.js`: the app (tabs, papers, practice deck, search, theme)
 - `js/content.js`: loads content from Supabase, with a saved copy and the built-in copy as fallbacks
 - `js/config.js`: Supabase URL and publishable key
+- `js/supabase.js`: sign-in, rows and file storage over fetch
+- `js/notes.js`: the Notes page and the admin panel

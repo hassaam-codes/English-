@@ -12,6 +12,26 @@ Until that is set up (or whenever Supabase cannot be reached) it uses the copy b
 
 The publishable key is meant to be public. Never put the database password or a `service_role` / secret key in this repo.
 
+## Admin panel (uploading notes)
+
+The admin panel is at `/#/admin` on the site (for example `https://your-site.vercel.app/#/admin`). It is not in the menu.
+
+Create the admin login once, after running `setup.sql`:
+
+1. In Supabase go to **Authentication > Users > Add user > Create new user**.
+2. Email: `admin@english-papers.app`. Password: choose your own. Tick **Auto Confirm User**.
+3. On the site, sign in with username `admin` and that password.
+
+The password is checked by Supabase. It is not stored anywhere in the site's code, so do not add it there.
+Pick a password that is hard to guess: anyone who has it can upload and delete notes.
+
+What the admin can do: upload a PDF or image (up to 25 MB) with a title and description, and delete uploads.
+Uploads appear on the **Notes** tab for everyone straight away.
+
+Only email addresses listed in the `admins` table can upload or delete, even if someone else manages to
+create an account. To add a second admin, create their user as above (username `teacher` means the email
+`teacher@english-papers.app`) and add that email as a row in `admins`.
+
 ## Editing content
 
 Use **Table Editor** in Supabase:
@@ -22,6 +42,8 @@ Use **Table Editor** in Supabase:
 | `questions` | every Q.8 and Q.9 sentence with its `answer`; `position` 0 is (i), 1 is (ii) and so on |
 | `repeated` | the repeated-question lists (`kind` is `q8`, `q9` or `topics`) |
 | `site_text` | headings and notes shown on the site |
+| `notes` | files uploaded from the admin panel (the files themselves are in Storage > `notes`) |
+| `admins` | email addresses allowed to upload and delete |
 
 To add a new year: add a row to `papers` (give it the next `sort` number), then its rows in `questions`
 with ids like `2027-1-q8-0`. It appears on the site by itself.
