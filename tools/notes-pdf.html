@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  @page { size: A4; margin: 16mm 16mm 20mm; }
+  :root { --ink: #171717; --ink-2: #525252; --muted: #6e6e73; --line: #e4e4e7; --blue: #1d4ed8; --raised: #f6f6f7; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font-family: "Geist", system-ui, sans-serif; font-size: 10.5pt; line-height: 1.45; color: var(--ink); }
+  .ur { font-family: "Noto Nastaliq Urdu", serif; direction: rtl; unicode-bidi: isolate; }
+  .brand { display: flex; align-items: center; gap: 8pt; font-weight: 500; font-size: 11pt; }
+  .brand svg { width: 22pt; height: 22pt; }
+  .kicker { margin: 26pt 0 2pt; font-size: 11pt; color: var(--ink-2); }
+  h1 { font-size: 34pt; line-height: 1.05; letter-spacing: -0.03em; font-weight: 500; margin: 0; }
+  .rule { width: 40pt; height: 3pt; border-radius: 2pt; background: var(--blue); margin: 14pt 0 4pt; }
+  .sec { margin-top: 16pt; }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10pt; margin-bottom: 5pt; break-after: avoid; }
+  .sec-head h2 { font-size: 13pt; font-weight: 500; margin: 0; }
+  .sec-head span { font-family: "Geist Mono", monospace; font-size: 8pt; color: var(--muted); white-space: nowrap; }
+  .rows { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .row { display: grid; grid-template-columns: 20pt 1fr auto; align-items: center; gap: 8pt; padding: 1pt 6pt; break-inside: avoid; }
+  .row + .row { border-top: 1px solid var(--line); }
+  .row .n { font-family: "Geist Mono", monospace; font-size: 8pt; color: var(--blue); }
+  .row .en { font-size: 10.5pt; padding: 3pt 0; }
+  .row .ur { font-size: 11.5pt; line-height: 1.95; text-align: right; max-width: 78mm; }
+  .prose p { margin: 0 0 8pt; }
+  .qa { margin: 0 0 8pt; break-inside: avoid; } .qa b { font-weight: 500; } .qa p { margin: 2pt 0 0; color: var(--ink-2); }
+  table { width: 100%; border-collapse: collapse; } th { text-align: left; font-weight: 500; font-size: 8.5pt; color: var(--muted); padding: 5pt 8pt; background: var(--raised); }
+  td { padding: 5pt 8pt; border-top: 1px solid var(--line); vertical-align: top; } tr { break-inside: avoid; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module">
+  import { ENGLISH_A, ENGLISH_B } from "../js/book.js";
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  const q = new URLSearchParams(location.search);
+  const book = q.get("book") === "a" ? ENGLISH_A : ENGLISH_B;
+  const ch = book.chapters.find((c) => c.id === q.get("id"));
+  const LOGO = `<svg viewBox="0 0 64 64"><path fill="#1d4ed8" d="M14 0h30l20 20v30a14 14 0 0 1-14 14H14A14 14 0 0 1 0 50V14A14 14 0 0 1 14 0z"/><path fill="#8fb0ff" d="M44 0v12a8 8 0 0 0 8 8h12z"/><g fill="none" stroke="#fff" stroke-width="7.5" stroke-linecap="round"><circle cx="29" cy="28" r="9.75"/><path d="M38.75 28v8c0 10-6.5 15.75-16.5 15.75"/></g></svg>`;
+  const body = (s) => {
+    if (s.kind === "pairs") return `<div class="rows">${s.items.map((it, i) => `<div class="row"><span class="n">${i + 1}</span><span class="en">${esc(it.en)}</span><span class="ur" lang="ur" dir="rtl">${esc(it.ur)}</span></div>`).join("")}</div>`;
+    if (s.kind === "qa") return s.items.map((it, i) => `<div class="qa"><b>Q.${i + 1} ${esc(it.q)}</b><p>${esc(it.a)}</p></div>`).join("");
+    if (s.kind === "list") return `<ul>${s.items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
+    if (s.kind === "table") return `<table>${s.head ? `<thead><tr>${s.head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead>` : ""}<tbody>${s.rows.map((r) => `<tr>${r.map((c) => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+    return `<div class="prose ${s.urdu ? "ur" : ""}">${(s.paras || []).map((p) => `<p>${esc(p)}</p>`).join("")}</div>`;
+  };
+  document.title = `${ch.title} — ${book.name}`;
+  document.getElementById("root").innerHTML = `
+    <div class="brand">${LOGO}<span>9th English</span></div>
+    <p class="kicker">${esc(book.name)} · ${esc(book.label)}</p>
+    <h1>${esc(ch.title)}</h1><div class="rule"></div>
+    ${ch.sections.map((s) => `<section class="sec"><div class="sec-head"><h2>${esc(s.title)}</h2>${s.items ? `<span>${s.items.length} sentence${s.items.length === 1 ? "" : "s"}</span>` : ""}</div>${body(s)}</section>`).join("")}`;
+  window.__footer = `9th English — ${book.name} — ${ch.title}`;
+  await document.fonts.ready;
+  window.__ready = true;
+</script>
+</body>
+</html>

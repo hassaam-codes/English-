@@ -17,7 +17,9 @@ A 9th class English site, built mobile first like an app.
 - Light and dark themes, reduced-motion support, a designed PDF of the papers.
 
 ### Adding a chapter
-Open `js/book.js`. The comment at the top shows the shape of a chapter. Sections can be text (`paras`), question answers (`qa`), a list or a table, in English or Urdu.
+Open `js/book.js`. The comment at the top shows the shape of a chapter. Sections can be text (`paras`), question answers (`qa`), Urdu with English (`pairs`), a list or a table. A long chapter can live in its own file under `js/book/` (see `js/book/tenses.js`). Chapters with more than six sections get a contents page.
+
+To build the designed PDF for a chapter: `node tools/make-notes-pdf.js b tenses assets/notes/Tenses.pdf`, then set the chapter's `pdf` field to that path.
 
 ## Run locally
 No build step. Serve the folder with any static server:

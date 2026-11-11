@@ -17,6 +17,11 @@
 //
 // Add  urdu: true  to a section whose text is in Urdu.
 
+//   { title: "Exercise 1", kind: "pairs", items: [{ en: "English sentence.", ur: "اردو جملہ۔" }] }   // Urdu with its English
+//
+// A long chapter can live in its own file under js/book/ and be imported here.
+import tenses from "./book/tenses.js";
+
 export const ENGLISH_A = {
   key: "a",
   name: "English A",
@@ -30,5 +35,5 @@ export const ENGLISH_B = {
   name: "English B",
   label: "Grammar",
   about: "Grammar topics with rules and examples",
-  chapters: [],
+  chapters: [tenses],
 };

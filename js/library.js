@@ -4,11 +4,17 @@ import { ENGLISH_A, ENGLISH_B } from "./book.js";
 
 const BOOKS = { a: ENGLISH_A, b: ENGLISH_B };
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+const LONG = 6; // chapters with more sections than this get a contents list instead of a row of tabs
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // "Summary · 12 questions" for the chapter row
 function overview(ch) {
-  return (ch.sections || []).map((s) => (s.kind === "qa" ? `${s.items.length} question${s.items.length === 1 ? "" : "s"}` : s.title)).join(" · ");
+  const secs = ch.sections || [];
+  if (secs.length > LONG) {
+    const n = secs.reduce((t, s) => t + (s.items ? s.items.length : 0), 0);
+    return `${secs.length} sections${n ? ` · ${n} sentences` : ""}`;
+  }
+  return secs.map((s) => (s.kind === "qa" ? `${s.items.length} question${s.items.length === 1 ? "" : "s"}` : s.title)).join(" · ");
 }
 
 function listHTML(book) {
@@ -29,6 +35,9 @@ function sectionHTML(s) {
   if (s.kind === "qa") return `<ol class="qa">${s.items.map((it, i) => `<li class="qa-item" style="--i:${Math.min(i, 10)}">
       <p class="qa-q"><span class="qa-n">Q.${i + 1}</span><span${dir}>${esc(it.q)}</span></p>
       <p class="qa-a"${s.urdu ? ' lang="ur" dir="rtl"' : ""}>${esc(it.a)}</p></li>`).join("")}</ol>`;
+  if (s.kind === "pairs") return `<ol class="pairs">${s.items.map((it, i) => `<li class="pair" style="--i:${Math.min(i, 10)}">
+      <span class="pair-n">${i + 1}</span>
+      <span class="pair-body">${it.ur ? `<span class="pair-ur" lang="ur" dir="rtl">${esc(it.ur)}</span>` : ""}${it.en ? `<span class="pair-en">${esc(it.en)}</span>` : ""}</span></li>`).join("")}</ol>`;
   if (s.kind === "list") return `<ul class="prose-list"${s.urdu ? ' lang="ur" dir="rtl"' : ""}>${s.items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
   if (s.kind === "table") return `<div class="table-wrap"><table class="notes-table">
       ${s.head ? `<thead><tr>${s.head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead>` : ""}
@@ -38,23 +47,43 @@ function sectionHTML(s) {
 
 function chapterHTML(book, ch, at) {
   const secs = ch.sections || [];
-  const i = Math.min(Math.max(at, 0), Math.max(secs.length - 1, 0));
+  const long = secs.length > LONG;
   const idx = book.chapters.indexOf(ch), prev = book.chapters[idx - 1], next = book.chapters[idx + 1];
   const link = (c) => `#/${book.key}/${encodeURIComponent(c.id)}`;
-  return `<div class="view-head">
-      <a class="back" href="#/${book.key}"><i class="ph ph-arrow-left" aria-hidden="true"></i>${esc(book.name)}</a>
-      ${ch.no ? `<p class="chapter-kicker">${esc(ch.no)}</p>` : ""}
-      <h2 class="view-title">${esc(ch.title)}</h2>
-    </div>
+  const head = (backHref, backText, kicker, title) => `<div class="view-head">
+      <a class="back" href="${backHref}"><i class="ph ph-arrow-left" aria-hidden="true"></i>${esc(backText)}</a>
+      ${kicker ? `<p class="chapter-kicker">${esc(kicker)}</p>` : ""}
+      <h2 class="view-title">${esc(title)}</h2>
+    </div>`;
+  const pager = (p, n, count) => `<div class="pager">
+      ${p ? `<a class="btn btn-ghost btn-sm" href="${p}"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>Previous</span></a>` : "<span></span>"}
+      <span class="pager-count">${count}</span>
+      ${n ? `<a class="btn btn-ghost btn-sm" href="${n}"><span>Next</span><i class="ph ph-arrow-right" aria-hidden="true"></i></a>` : "<span></span>"}
+    </div>`;
+  const pdf = ch.pdf ? `<a class="btn btn-ghost btn-sm pdf-link" href="${esc(ch.pdf)}" download><i class="ph ph-download-simple" aria-hidden="true"></i><span>Download PDF</span></a>` : "";
+
+  // Long chapter, no section chosen: show its contents
+  if (long && at === null) {
+    return `${head(`#/${book.key}`, book.name, ch.no, ch.title)}${pdf}
+      <div class="chapter-list">${secs.map((s, n) => `<a class="chapter" style="--i:${Math.min(n, 10)}" href="${link(ch)}/${n}">
+        <span class="chapter-no">${n + 1}</span>
+        <span><span class="chapter-title">${esc(s.title)}</span>${s.items ? `<span class="chapter-meta">${s.items.length} sentence${s.items.length === 1 ? "" : "s"}</span>` : ""}</span>
+        <i class="ph ph-caret-right" aria-hidden="true"></i></a>`).join("")}</div>
+      ${pager(prev && link(prev), next && link(next), `${idx + 1} / ${book.chapters.length}`)}`;
+  }
+  const i = Math.min(Math.max(at || 0, 0), Math.max(secs.length - 1, 0));
+  // Long chapter, one section: its own page with previous / next section
+  if (long) {
+    return `${head(link(ch), ch.title, `${i + 1} of ${secs.length}`, secs[i].title)}
+      ${sectionHTML(secs[i])}
+      ${pager(i > 0 && `${link(ch)}/${i - 1}`, i < secs.length - 1 && `${link(ch)}/${i + 1}`, `${i + 1} / ${secs.length}`)}`;
+  }
+  return `${head(`#/${book.key}`, book.name, ch.no, ch.title)}${pdf}
     ${secs.length > 1 ? `<div class="chip-rail" role="tablist" aria-label="Sections">${secs.map((s, n) =>
       `<a class="chip" role="tab" aria-current="${n === i}" href="${link(ch)}/${n}">${esc(s.title)}</a>`).join("")}</div>` : ""}
     ${secs.length ? `<h3 class="list-title">${esc(secs[i].title)}</h3>${sectionHTML(secs[i])}`
       : '<div class="empty"><i class="ph ph-hourglass" aria-hidden="true"></i><p>This chapter is being added</p></div>'}
-    <div class="pager">
-      ${prev ? `<a class="btn btn-ghost btn-sm" href="${link(prev)}"><i class="ph ph-arrow-left" aria-hidden="true"></i><span>Previous</span></a>` : "<span></span>"}
-      <span class="pager-count">${idx + 1} / ${book.chapters.length}</span>
-      ${next ? `<a class="btn btn-ghost btn-sm" href="${link(next)}"><span>Next</span><i class="ph ph-arrow-right" aria-hidden="true"></i></a>` : "<span></span>"}
-    </div>`;
+    ${pager(prev && link(prev), next && link(next), `${idx + 1} / ${book.chapters.length}`)}`;
 }
 
 let last = "";
@@ -65,9 +94,10 @@ function render() {
   const box = document.getElementById(`view-${key}`);
   const ch = id && book.chapters.find((c) => c.id === decodeURIComponent(id));
   if (id && !ch) { history.replaceState(null, "", `#/${key}`); }
-  box.innerHTML = ch ? chapterHTML(book, ch, +sec || 0) : listHTML(book);
+  const at = sec === undefined || sec === "" || isNaN(+sec) ? null : +sec;
+  box.innerHTML = ch ? chapterHTML(book, ch, at) : listHTML(book);
   // New chapter or back to the list: start at the top. Switching section keeps your place.
-  const where = `${key}/${ch ? ch.id : ""}`;
+  const where = `${key}/${ch ? ch.id : ""}/${ch && (ch.sections || []).length > LONG ? at : ""}`;
   if (where !== last) window.scrollTo(0, 0);
   else box.querySelector('.chip[aria-current="true"]')?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", inline: "center", block: "nearest" });
   last = where;
