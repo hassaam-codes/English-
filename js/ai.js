@@ -16,7 +16,7 @@ let chat = [];        // [{ role: "user" | "assistant", content, error? }]
 let fresh = 0;       // how many bubbles have already been shown (these do not animate again)
 let busy = null;      // AbortController while an answer is arriving
 try { const saved = JSON.parse(sessionStorage.getItem(KEY) || "null"); if (saved && Array.isArray(saved.chat)) { chat = saved.chat; } } catch (e) {}
-const remember = () => { try { sessionStorage.setItem(KEY, JSON.stringify({ chat: chat.filter((m) => !m.error) })); } catch (e) {} };
+const remember = () => { try { sessionStorage.setItem(KEY, JSON.stringify({ chat: chat.filter((m) => !m.error).map(({ role, content }) => ({ role, content })) })); } catch (e) {} };
 
 /* ---------- Small, safe formatter: paragraphs, lists, **bold**, `code`. Everything is escaped first. ---------- */
 const URDU = /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/;
@@ -49,7 +49,13 @@ function format(text) {
 function bubble(m, i) {
   if (m.role === "user") return `<div class="ai-msg ai-user"><p dir="auto"${URDU.test(m.content) ? ' class="has-ur"' : ""}>${esc(m.content).replace(/\n/g, "<br>")}</p></div>`;
   if (m.error) return `<div class="ai-msg ai-bot ai-error" data-i="${i}"><p>${esc(m.content)}</p><button class="btn btn-ghost btn-sm" type="button" data-retry><i class="ph ph-arrow-clockwise" aria-hidden="true"></i>Try again</button></div>`;
-  return `<div class="ai-msg ai-bot" data-i="${i}">${m.content ? format(m.content) : '<p class="ai-wait"><span></span><span></span><span></span><span class="sr-only">Thinking</span></p>'}</div>`;
+  let text = m.content;
+  if (m.typing) { // while typing, only the letters revealed so far (and close a half-typed **bold** so no stars show)
+    text = [...m.content].slice(0, m.shown).join("").replace(/\*+$/, "");
+    const lastLine = text.slice(text.lastIndexOf("\n") + 1);
+    if ((lastLine.match(/\*\*/g) || []).length % 2) text += "**";
+  }
+  return `<div class="ai-msg ai-bot" data-i="${i}">${text ? format(text) : '<p class="ai-wait"><span></span><span></span><span></span><span class="sr-only">Thinking</span></p>'}</div>`;
 }
 function draw() {
   newBtn.hidden = !chat.length;
@@ -95,8 +101,25 @@ async function ask(text) {
   draw();
   const ctrl = new AbortController();
   setBusy(ctrl);
-  let frame = 0;
-  const paint = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; redrawLast(); }); };
+  // Typewriter: the answer arrives in chunks of words, but is shown a letter at a time. When a lot of text is
+  // waiting it types faster, so the screen never falls far behind the answer.
+  reply.typing = true; reply.shown = 0;
+  let frame = 0, lastTick = 0, carry = 0;
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const step = (now) => {
+    frame = 0;
+    const total = [...reply.content].length, waiting = total - reply.shown;
+    if (waiting > 0) {
+      const dt = Math.min(now - (lastTick || now), 100); lastTick = now;
+      carry += (still ? 1e6 : Math.max(60, waiting * 2.5)) * dt / 1000 || 1; // letters per second: 60, more when behind
+      const n = Math.floor(carry); carry -= n;
+      if (n > 0) { reply.shown = Math.min(total, reply.shown + n); redrawLast(); }
+      frame = requestAnimationFrame(step);
+    } else { lastTick = 0; if (typed) typed(); }
+  };
+  let typed = null;
+  const paint = () => { if (!frame) frame = requestAnimationFrame(step); };
+  const allTyped = () => new Promise((done) => { if ([...reply.content].length <= reply.shown) return done(); typed = done; ctrl.finish = () => { reply.shown = Infinity; done(); }; paint(); });
   const failWith = (msg) => { reply.content = msg; reply.error = true; };
   try {
     const res = await fetch("/api/chat", {
@@ -134,7 +157,9 @@ async function ask(text) {
     else if (reply.content) reply.content += "\n\n(The connection dropped before the answer finished.)";
     else failWith("You seem to be offline. Check your internet and try again.");
   }
+  if (reply.error || ctrl.signal.aborted) reply.shown = Infinity; else await allTyped(); // let the last letters finish typing
   if (frame) { cancelAnimationFrame(frame); frame = 0; }
+  delete reply.typing; delete reply.shown;
   setBusy(null);
   if (chat[chat.length - 1] === reply) redrawLast(); else { fresh = Math.min(fresh, chat.length); draw(); }
   newBtn.hidden = !chat.length;
@@ -149,7 +174,7 @@ input.addEventListener("keydown", (e) => {
 });
 form.addEventListener("submit", (e) => {
   e.preventDefault();
-  if (busy) { busy.abort(); return; }
+  if (busy) { busy.abort(); if (busy.finish) busy.finish(); return; }
   const text = input.value.trim();
   if (!text) { input.focus(); return; }
   input.value = ""; grow();
