@@ -8,9 +8,9 @@
   --line: rgba(16, 24, 20, 0.09);
   --text: #171717;
   --muted: #525252;
-  --accent: #171717;
-  --accent-soft: rgba(23, 23, 23, 0.06);
-  --accent-ink: #fafafa;
+  --accent: #1d4ed8;
+  --accent-soft: rgba(29, 78, 216, 0.08);
+  --accent-ink: #ffffff;
   --paper: #fbfbf8;
   --paper-ink: #1b1b1b;
   --paper-muted: #666;
@@ -31,14 +31,14 @@
   :root:not([data-theme="light"]) {
     --bg: #141415; --bg-2: #19191b; --surface: rgba(25, 25, 27, 0.7); --surface-solid: #19191b;
     --shell: rgba(255, 255, 255, 0.035); --line: rgba(255, 255, 255, 0.08); --text: #ededed; --muted: #a1a1a6;
-    --accent: #ededed; --accent-soft: rgba(237, 237, 237, 0.08); --accent-ink: #141415;
+    --accent: #6b9bff; --accent-soft: rgba(107, 155, 255, 0.12); --accent-ink: #0b1220;
     --paper: #f1f0eb; --paper-box: #e7e6e1; --raised: #232325; --shadow: 0 12px 32px rgba(0, 0, 0, 0.35); --shadow-sm: none; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #141415; --bg-2: #19191b; --surface: rgba(25, 25, 27, 0.7); --surface-solid: #19191b;
   --shell: rgba(255, 255, 255, 0.035); --line: rgba(255, 255, 255, 0.08); --text: #ededed; --muted: #a1a1a6;
-  --accent: #ededed; --accent-soft: rgba(237, 237, 237, 0.08); --accent-ink: #141415;
+  --accent: #6b9bff; --accent-soft: rgba(107, 155, 255, 0.12); --accent-ink: #0b1220;
   --paper: #f1f0eb; --paper-box: #e7e6e1; --raised: #232325; --shadow: 0 12px 32px rgba(0, 0, 0, 0.35); --shadow-sm: none; color-scheme: dark;
 }
 
@@ -113,7 +113,7 @@ button { font: inherit; color: inherit; }
 .btn-primary { background: var(--accent); color: var(--accent-ink); }
 .btn-primary .btn-icon { background: color-mix(in srgb, var(--accent-ink) 14%, transparent); }
 .btn-ghost { background: var(--shell); border-color: var(--line); color: var(--text); }
-.btn-ghost .btn-icon { background: var(--accent-soft); color: var(--text); }
+.btn-ghost .btn-icon { background: var(--accent-soft); color: var(--accent); }
 .btn-sm { font-size: 0.85rem; padding: 0.3rem 0.35rem 0.3rem 1.1rem; }
 .btn-sm:not(:has(.btn-icon)) { padding: 0.55rem 1.1rem; }
 .btn-sm .btn-icon { width: 1.9rem; height: 1.9rem; }
@@ -221,10 +221,10 @@ button { font: inherit; color: inherit; }
 .items .ur { font-family: var(--urdu); font-size: 1.3rem; line-height: 2.3; direction: rtl; unicode-bidi: isolate; text-align: left; justify-self: start; }
 .items .en { font-size: 0.97rem; line-height: 1.75; }
 .rep-tag {
-  font-family: var(--sans); font-size: 0.66rem; font-weight: 600; color: #333333; background: rgba(0, 0, 0, 0.07);
+  font-family: var(--sans); font-size: 0.66rem; font-weight: 600; color: #1e40af; background: rgba(29, 78, 216, 0.1);
   border-radius: 999px; padding: 0.1rem 0.5rem; white-space: nowrap; cursor: help;
 }
-.items li.is-rep { background: rgba(0, 0, 0, 0.035); }
+.items li.is-rep { background: rgba(29, 78, 216, 0.045); }
 mark { background: #ffe07a; color: inherit; border-radius: 3px; padding: 0 1px; }
 .alt-box { background: var(--paper-box); border-left: 4px solid #999; padding: 0.75rem 1rem; margin: 1rem 0 0.5rem; font-size: 0.88rem; }
 .alt-box b { display: block; color: #333; margin-bottom: 0.2rem; }
@@ -256,7 +256,7 @@ mark { background: #ffe07a; color: inherit; border-radius: 3px; padding: 0 1px; 
 .rep-table tbody tr:hover { background: var(--accent-soft); }
 .rep-note { color: var(--muted); font-size: 0.8rem; margin: 1rem 0 0; }
 .rep-jump { background: none; border: 0; padding: 0; cursor: pointer; text-align: left; color: inherit; font: inherit; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
-.rep-jump:hover { text-decoration-color: var(--text); color: var(--text); }
+.rep-jump:hover { text-decoration-color: var(--accent); color: var(--accent); }
 
 /* ---------- Footer ---------- */
 .footer { padding: 3rem 0 4rem; border-top: 1px solid var(--line); }
