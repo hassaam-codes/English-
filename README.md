@@ -23,6 +23,11 @@ python3 -m http.server 8000
 ## Deploy
 Upload the folder as-is to GitHub Pages, Netlify or Vercel (static site, no framework).
 
+## PDF
+- `assets/English_Papers_2022-2026.pdf`: the designed PDF (what the Download button gives)
+- `assets/Past_papers.pdf`: the original source PDF
+- Rebuild after editing `js/data.js`: `npm i playwright && node tools/make-pdf.js` (template: `tools/pdf.html`)
+
 ## Logo
 - `assets/logo.svg`: the mark (a sheet of paper with a folded corner and a 9)
 - `assets/icons/`: browser tab icon and phone home-screen icons
