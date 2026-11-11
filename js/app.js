@@ -1,5 +1,10 @@
-import { COVER, PAPERS, REPEATED, Q8_HEADING, Q9_HEADING, ALT_HEADING, ROMAN } from "./data.js";
-import { ANSWERS } from "./answers.js";
+import { ROMAN } from "./data.js";
+import { loadContent } from "./content.js";
+
+// Content comes from Supabase when it is set up, otherwise from the copy built into the site.
+const { COVER, PAPERS, REPEATED, Q8_HEADING, Q9_HEADING, ALT_HEADING, ANSWERS, source: CONTENT_SOURCE } = await loadContent();
+document.documentElement.dataset.content = CONTENT_SOURCE;
+const roman = (i) => ROMAN[i] || `(${i + 1})`; // a paper added in the database may have more than eight items
 
 const $ = (s, el = document) => el.querySelector(s);
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -79,7 +84,7 @@ function itemHTML(it, idx, { q = "", showSrc = false } = {}) {
   const r = repMap.get(it.text);
   const isDone = done.has(it.id);
   return `<li class="item ${isDone ? "is-done" : ""}" style="--i:${idx}" data-id="${it.id}">
-    <span class="num">${ROMAN[it.i]}</span>
+    <span class="num">${roman(it.i)}</span>
     <span class="text">
       <span class="${it.ur ? "ur" : "en"}" ${it.ur ? 'lang="ur" dir="rtl"' : ""}>${highlight(it.text, q)}</span>
       ${showSrc ? `<span class="src">${esc(paperLabel(it.paper))} · ${it.kind === "q8" ? "Q.8" : "Q.9"}</span>` : ""}
@@ -266,7 +271,7 @@ function cardHTML(it) {
         ${top}
         <p class="f-ask">${esc(it.kind === "q8" ? Q8_HEADING : Q9_HEADING)}</p>
         <div class="f-body">${q}</div>
-        <div class="f-foot"><span class="f-src">${esc(paperLabel(it.paper))} · ${ROMAN[it.i]}</span><span class="f-hint"><i class="ph ph-hand-tap" aria-hidden="true"></i> Tap for answer</span></div>
+        <div class="f-foot"><span class="f-src">${esc(paperLabel(it.paper))} · ${roman(it.i)}</span><span class="f-hint"><i class="ph ph-hand-tap" aria-hidden="true"></i> Tap for answer</span></div>
       </div>
       <div class="f-face f-back" aria-hidden="true">
         <div class="f-top"><span class="f-q">Answer</span><span class="f-hint"><i class="ph ph-arrow-u-up-left" aria-hidden="true"></i> Tap for question</span></div>

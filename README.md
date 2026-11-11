@@ -24,6 +24,9 @@ python3 -m http.server 8000
 ## Deploy
 Upload the folder as-is to GitHub Pages, Netlify or Vercel (static site, no framework).
 
+## Database
+Content can be served from Supabase (read-only for the public). See [`supabase/README.md`](supabase/README.md) for the one-time setup. Without it the site uses the built-in copy in `js/data.js` and `js/answers.js`.
+
 ## PDF
 - `assets/English_Papers_2022-2026.pdf`: the designed PDF (what the Download button gives)
 - `assets/Past_papers.pdf`: the original source PDF
@@ -38,4 +41,6 @@ Upload the folder as-is to GitHub Pages, Netlify or Vercel (static site, no fram
 - `index.html`: page structure
 - `css/styles.css`: design tokens, layout, motion
 - `js/data.js`: all paper text (edit here to add a new year)
-- `js/app.js`: rendering, filters, search, theme, menu
+- `js/app.js`: the app (tabs, papers, practice deck, search, theme)
+- `js/content.js`: loads content from Supabase, with a saved copy and the built-in copy as fallbacks
+- `js/config.js`: Supabase URL and publishable key
