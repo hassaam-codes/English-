@@ -1,4 +1,5 @@
 import { COVER, PAPERS, REPEATED, Q8_HEADING, Q9_HEADING, ALT_HEADING, ROMAN } from "./data.js";
+import { ANSWERS } from "./answers.js";
 
 const $ = (s, el = document) => el.querySelector(s);
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -85,6 +86,7 @@ function itemHTML(it, idx, { q = "", showSrc = false } = {}) {
       <span class="${it.ur ? "ur" : "en"}" ${it.ur ? 'lang="ur" dir="rtl"' : ""}>${highlight(it.text, q)}</span>
       ${showSrc ? `<span class="src">${esc(paperLabel(it.paper))} · ${it.kind === "q8" ? "Q.8" : "Q.9"}</span>` : ""}
       ${r ? `<span class="rep-tag">Repeated ${r.times}×</span>` : ""}
+      <span class="ans" hidden><span class="ans-label">Answer</span>${esc(ANSWERS[it.text] || "")}</span>
     </span>
     <button class="check" type="button" aria-pressed="${isDone}" aria-label="Mark as practised">
       <i class="ph${isDone ? "-fill" : ""} ph-check-circle" aria-hidden="true"></i>
@@ -93,7 +95,12 @@ function itemHTML(it, idx, { q = "", showSrc = false } = {}) {
 }
 document.addEventListener("click", (e) => {
   const b = e.target.closest(".check");
-  if (!b) return;
+  if (!b) {
+    // Tap a sentence to show or hide its answer
+    const t = e.target.closest(".item .text");
+    if (t) { const a = t.querySelector(".ans"); a.hidden = !a.hidden; t.closest(".item").classList.toggle("is-open", !a.hidden); buzz(6); }
+    return;
+  }
   const li = b.closest(".item");
   const on = b.getAttribute("aria-pressed") !== "true";
   setDone(li.dataset.id, on);
@@ -194,6 +201,7 @@ function renderPaper(dir = 0) {
     </div>`;
   } else {
     body = `<div class="q-intro"><p>${esc(paperState.section === "q8" ? Q8_HEADING : Q9_HEADING)}</p><span class="marks">5 marks</span></div>
+      <p class="tap-hint"><i class="ph ph-hand-tap" aria-hidden="true"></i> Tap a sentence to see its answer</p>
       <ol class="items">${items.map((it, i) => itemHTML(it, i)).join("")}</ol>`;
   }
   el.innerHTML = `
@@ -317,11 +325,30 @@ function buildDeck(kind) {
 }
 function cardHTML(it) {
   const r = repMap.get(it.text);
-  return `<div class="f-top"><span class="f-q">${it.kind === "q8" ? "Q.8" : "Q.9"}</span>${r ? `<span class="rep-tag">Repeated ${r.times}×</span>` : ""}</div>
-    <p class="f-ask">${esc(it.kind === "q8" ? Q8_HEADING : Q9_HEADING)}</p>
-    <div class="f-body"><span class="${it.ur ? "ur" : "en"}" ${it.ur ? 'lang="ur" dir="rtl"' : ""}>${esc(it.text)}</span></div>
-    <span class="f-src">${esc(paperLabel(it.paper))} · ${ROMAN[it.i]}</span>
+  const top = `<div class="f-top"><span class="f-q">${it.kind === "q8" ? "Q.8" : "Q.9"}</span>${r ? `<span class="rep-tag">Repeated ${r.times}×</span>` : ""}</div>`;
+  const q = `<span class="${it.ur ? "ur" : "en"}" ${it.ur ? 'lang="ur" dir="rtl"' : ""}>${esc(it.text)}</span>`;
+  return `<div class="f-inner">
+      <div class="f-face f-front">
+        ${top}
+        <p class="f-ask">${esc(it.kind === "q8" ? Q8_HEADING : Q9_HEADING)}</p>
+        <div class="f-body">${q}</div>
+        <div class="f-foot"><span class="f-src">${esc(paperLabel(it.paper))} · ${ROMAN[it.i]}</span><span class="f-hint"><i class="ph ph-hand-tap" aria-hidden="true"></i> Tap for answer</span></div>
+      </div>
+      <div class="f-face f-back" aria-hidden="true">
+        <div class="f-top"><span class="f-q">Answer</span><span class="f-hint"><i class="ph ph-arrow-u-up-left" aria-hidden="true"></i> Tap for question</span></div>
+        <div class="f-body"><span class="f-answer">${esc(ANSWERS[it.text] || "")}</span></div>
+        <div class="f-quest">${q}</div>
+      </div>
+    </div>
     <span class="stamp yes">Got it</span><span class="stamp no">Again</span>`;
+}
+function flipTop() {
+  const top = $('#deck .fcard[data-depth="0"]:not(.flying)');
+  if (!top) return;
+  const on = top.classList.toggle("flipped");
+  top.querySelector(".f-front").setAttribute("aria-hidden", String(on));
+  top.querySelector(".f-back").setAttribute("aria-hidden", String(!on));
+  buzz(6);
 }
 function renderDeck() {
   const box = $("#deck");
@@ -373,17 +400,18 @@ function fling(dir) {
 function bindDrag(card) {
   if (card.dataset.bound) return;
   card.dataset.bound = "1";
-  let x0 = 0, y0 = 0, dx = 0, pid = null;
+  let x0 = 0, y0 = 0, dx = 0, moved = 0, pid = null;
   const yes = card.querySelector(".stamp.yes"), no = card.querySelector(".stamp.no");
   card.addEventListener("pointerdown", (e) => {
     if (card.dataset.depth !== "0") return;
-    pid = e.pointerId; x0 = e.clientX; y0 = e.clientY; dx = 0;
+    pid = e.pointerId; x0 = e.clientX; y0 = e.clientY; dx = 0; moved = 0;
     card.setPointerCapture(pid);
     card.classList.add("dragging");
   });
   card.addEventListener("pointermove", (e) => {
     if (e.pointerId !== pid) return;
     dx = e.clientX - x0;
+    moved = Math.max(moved, Math.hypot(dx, e.clientY - y0));
     const dy = (e.clientY - y0) * 0.25;
     card.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx / 18}deg)`;
     yes.style.opacity = Math.max(0, Math.min(1, dx / 90));
@@ -393,6 +421,7 @@ function bindDrag(card) {
     if (e.pointerId !== pid) return;
     pid = null;
     if (Math.abs(dx) > 90) return fling(dx > 0 ? 1 : -1);
+    if (e.type === "pointerup" && moved < 8) flipTop();
     card.classList.remove("dragging");
     card.style.transform = "";
     yes.style.opacity = no.style.opacity = 0;
@@ -415,6 +444,7 @@ $("#deck").addEventListener("click", (e) => {
 });
 document.addEventListener("keydown", (e) => {
   if (current !== "practice" || e.target.closest("input")) return;
+  if (e.key === " " || e.key === "Enter") { if (!e.target.closest("button, a")) { e.preventDefault(); flipTop(); } }
   if (e.key === "ArrowRight") fling(1);
   if (e.key === "ArrowLeft") fling(-1);
 });

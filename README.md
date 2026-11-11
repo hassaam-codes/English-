@@ -8,7 +8,8 @@ All question text is copied exactly from `assets/Past_papers.pdf` and lives in `
 Built mobile first, like an app, with a bottom tab bar:
 - **Home:** a moving stack of the most repeated questions (tap to practise), your progress, and a swipeable row of papers.
 - **Papers:** pick a paper from the chip row or swipe left and right between papers. Switch between Q.8, Q.9 and the English medium question. Tick sentences you have practised. Search every paper in English or Urdu.
-- **Practice:** a flashcard deck for Q.8, Q.9 or only repeated questions. Swipe right if you can do it, left to see it again later.
+- **Practice:** a flashcard deck for Q.8, Q.9 or only repeated questions. Tap a card to flip it and see the answer. Swipe right if you can do it, left to see it again later.
+- **Answers:** suggested answers live in `js/answers.js` (they are not from the board or the source PDF). In Papers, tap a sentence to show its answer.
 - **Repeated:** every repeated question with how many times it came, each paper tappable.
 - Progress is saved on the device. Light and dark themes, reduced-motion support, PDF download.
 
