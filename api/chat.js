@@ -81,7 +81,7 @@ export default async function handler(req, res) {
     if (k && req.query && req.query.probe) { // TEMP: time one model on a real question
       const t0 = Date.now(); let first = 0, content = "", reasoning = 0, status = 0, err = "";
       try {
-        const q = "Explain the present perfect tense with examples";
+        const q = String(req.query.q || "Explain the present perfect tense with examples");
         const sys = `${INSTRUCTIONS}\n\n<contents>\n${INDEX}\n</contents>\n\n<notes>\n${pick(q, 20000)}\n</notes>`;
         const extra = req.query.extra ? JSON.parse(req.query.extra) : {};
         const ctl = new AbortController(); setTimeout(() => ctl.abort(), 50000);
@@ -94,7 +94,7 @@ export default async function handler(req, res) {
             for (const l of ls) { if (!l.startsWith("data:")) continue; const e = safeParse(l.slice(5).trim()); const d = e && e.choices && e.choices[0] && e.choices[0].delta; if (!d) continue;
               if (d.reasoning_content) reasoning += d.reasoning_content.length; if (d.content) { if (!first) first = Date.now() - t0; content += d.content; } } } }
       } catch (e) { err = String(e); }
-      return res.status(200).json({ model: req.query.probe, status, firstTextMs: first, totalMs: Date.now() - t0, reasoningChars: reasoning, answerChars: content.length, answer: content.slice(0, 500), err });
+      return res.status(200).json({ model: req.query.probe, status, firstTextMs: first, totalMs: Date.now() - t0, reasoningChars: reasoning, answerChars: content.length, answer: content.slice(0, 1800), err });
     }
     return res.status(200).json({
       keyFound: !!k,
