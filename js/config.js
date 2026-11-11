@@ -2,7 +2,11 @@
 // Both values are safe to be public: the key is the "publishable" (anon) key, and the database
 // only allows reading through it. NEVER put the database password or a service_role key here.
 export const SUPABASE_URL = "https://eesjmuluinoetqyshnyo.supabase.co";
-export const SUPABASE_KEY = ""; // paste the publishable / anon key here (Supabase > Project Settings > API Keys)
+export const SUPABASE_KEY = "sb_publishable_s3WKE62OZrWdev3oSFPOXw_dDABUKPC"; // publishable key (public by design)
+
+// Papers, questions and answers come from the copy built into the site (js/data.js, js/answers.js).
+// Set this to true only after running supabase/setup.sql, to load them from the database instead.
+export const PAPERS_FROM_DATABASE = false;
 
 // Admin sign-in for the upload page (/#/admin). This is a simple lock, checked in the browser:
 // anyone who reads this file can see it. Change both values here whenever you like.

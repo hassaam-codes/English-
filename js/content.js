@@ -5,7 +5,7 @@
 // So the site always has content to show.
 import * as bundled from "./data.js";
 import { ANSWERS as bundledAnswers } from "./answers.js";
-import { SUPABASE_URL, SUPABASE_KEY } from "./config.js";
+import { SUPABASE_URL, SUPABASE_KEY, PAPERS_FROM_DATABASE } from "./config.js";
 
 const CACHE_KEY = "lb9-content-v1";
 const TIMEOUT_MS = 4000;
@@ -84,7 +84,7 @@ const readCache = () => { try { return JSON.parse(localStorage.getItem(CACHE_KEY
 const writeCache = (c) => { try { localStorage.setItem(CACHE_KEY, JSON.stringify(c)); } catch (e) {} };
 
 export async function loadContent() {
-  if (!SUPABASE_URL || !SUPABASE_KEY) return fallback();
+  if (!PAPERS_FROM_DATABASE || !SUPABASE_URL || !SUPABASE_KEY) return fallback();
   const cached = readCache();
   if (cached && cached.PAPERS && cached.PAPERS.length) {
     // Show the saved copy now; fetch the latest for the next visit.

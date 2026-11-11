@@ -8,7 +8,7 @@ Until that is set up (or whenever Supabase cannot be reached) it uses the copy b
 1. Open your Supabase project, go to **SQL Editor**, choose **New query**.
 2. Paste the whole of [`setup.sql`](setup.sql) and press **Run**. This creates four tables, makes them read-only for the public, and loads all the content.
 3. Go to **Project Settings > API Keys** and copy the **publishable** key (older projects call it the **anon** key).
-4. Paste it into `js/config.js` as `SUPABASE_KEY`, commit, and let Vercel redeploy.
+4. Make sure it is in `js/config.js` as `SUPABASE_KEY`, set `PAPERS_FROM_DATABASE = true` in the same file, commit, and let Vercel redeploy.
 
 The publishable key is meant to be public. Never put the database password or a `service_role` / secret key in this repo.
 
