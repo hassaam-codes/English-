@@ -32,7 +32,7 @@ If notes are ever tampered with, change the password in `js/config.js`; for a re
 
 ## Books (round button)
 
-The round button in the bottom bar opens a **Books** page with **Book A** and **Book B**.
+The round button in the bottom bar opens a **Books** page with **Textbook** (English A) and **Grammar Book** (English B).
 In the admin page there is a section for each: choose the PDF (up to 400 MB) and press **Upload**.
 Uploading again replaces that book; **Remove** deletes it. The other book is not touched.
 

@@ -119,7 +119,7 @@ $("#admin-notes").addEventListener("click", async (e) => {
 
 /* ---------- Book A and Book B ---------- */
 const BOOK_MAX = 400 * 1024 * 1024;
-const BOOK_NAME = { a: "Book A", b: "Book B" };
+const BOOK_NAME = { a: "Textbook", b: "Grammar Book" };
 const booksChanged = (books) => document.dispatchEvent(new CustomEvent("books-change", { detail: books }));
 const bookMissing = (e) => /bucket/i.test(e.message || "") || e.status === 404
   ? "Book storage is not set up yet. Run supabase/book.sql in Supabase first" : e.message || "Something went wrong. Try again";

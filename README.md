@@ -12,7 +12,7 @@ A 9th class English site, built mobile first like an app.
 - **English B (grammar):** grammar topics, in the same format.
 - **Past papers:** the ten Lahore Board papers 2022 to 2026 (Q.8 and Q.9) with suggested answers; swipe between papers, search in English or Urdu, tick what you have practised.
 - **Quiz (inside Past papers):** flashcards for Q.8, Q.9 or only repeated questions. Tap to flip for the answer, swipe right if you know it.
-- **Books (round button):** Book A and Book B as PDFs, each uploaded from the admin page (see `supabase/README.md`). A book that has not been uploaded shows as 'being added'.
+- **Books (round button):** the Textbook and the Grammar Book as PDFs, each uploaded from the admin page (see `supabase/README.md`). A book that has not been uploaded shows as 'being added'.
 - **Repeated questions:** every question asked in more than one paper.
 - **Notes:** files uploaded from the admin page (`/#/admin`).
 - Light and dark themes, reduced-motion support, a designed PDF of the papers.

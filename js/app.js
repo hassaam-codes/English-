@@ -474,7 +474,7 @@ function route() {
 // pieces, joins them, and then offers the finished PDF to open.
 (() => {
   const KEY = "lb9-books", box = $("#book-list");
-  const INFO = { a: ["Book A", "Textbook"], b: ["Book B", "Grammar"] };
+  const INFO = { a: ["Textbook", "English A"], b: ["Grammar Book", "English B"] };
   const ready = {};   // key -> { time, url } joined PDFs, kept while the page is open
   let books = {};
   const mb = (n) => (n ? `${Math.max(1, Math.round(n / 1048576))} MB` : "");
