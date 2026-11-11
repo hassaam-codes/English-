@@ -78,6 +78,15 @@ export default async function handler(req, res) {
   // Opening /api/chat in a browser shows a small health report (never the key itself), to check the Vercel setup.
   if (req.method === "GET") {
     const k = process.env.NVIDIA_API_KEY || "";
+    if (k && req.query && req.query.test) { // TEMP: try one model with a tiny question
+      const t0 = Date.now();
+      try {
+        const r = await fetch(`${BASE}/chat/completions`, { method: "POST", headers: { Authorization: `Bearer ${k.trim()}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ model: String(req.query.test), messages: [{ role: "system", content: "You are an English teacher for 9th class students in Pakistan. Be brief." }, { role: "user", content: "Translate into English and explain the tense in one line, in Urdu: \u0645\u06cc\u06ba \u0646\u0627\u0634\u062a\u06c1 \u06a9\u0631 \u0686\u06a9\u0627 \u06c1\u0648\u06ba\u06d4" }], max_tokens: 400, temperature: 0.3 }) });
+        const txt = await r.text();
+        return res.status(200).json({ model: req.query.test, status: r.status, ms: Date.now() - t0, body: txt.slice(0, 1500) });
+      } catch (e) { return res.status(200).json({ model: req.query.test, error: String(e), ms: Date.now() - t0 }); }
+    }
     return res.status(200).json({
       keyFound: !!k,
       keyLooksRight: k.trim().startsWith("nvapi-") && k === k.trim(),
