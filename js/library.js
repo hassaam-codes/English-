@@ -21,16 +21,18 @@ function overview(ch) {
   return secs.map((s) => (s.kind === "qa" ? `${s.items.length} question${s.items.length === 1 ? "" : "s"}` : s.title)).join(" · ");
 }
 
+const tidy = (t) => String(t ?? "").replace(/^CHAPTER\b/, "Chapter");
+
 function listHTML(book) {
   const rows = book.chapters.map((ch, i) => (ch.fileOnly && ch.pdf
     // A file, not a page: the row opens the PDF itself
     ? `<a class="chapter" style="--i:${Math.min(i, 10)}" href="${esc(ch.pdf)}" target="_blank" rel="noopener">
       <span class="chapter-no chapter-file"><i class="ph ph-file-pdf" aria-hidden="true"></i></span>
-      <span><span class="chapter-title">${esc(ch.title)}</span><span class="chapter-meta">${esc(ch.fileNote || "PDF")}</span></span>
+      <span><span class="chapter-title">${esc(tidy(ch.title))}</span><span class="chapter-meta">${esc(ch.fileNote || "PDF")}</span></span>
       <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>`
     : `<a class="chapter" style="--i:${Math.min(i, 10)}" href="#/${book.key}/${encodeURIComponent(ch.id)}">
       <span class="chapter-no">${esc(ch.no || i + 1)}</span>
-      <span><span class="chapter-title">${esc(ch.title)}</span><span class="chapter-meta">${esc(overview(ch))}</span></span>
+      <span><span class="chapter-title">${esc(tidy(ch.title))}</span><span class="chapter-meta">${esc(overview(ch))}</span></span>
       <i class="ph ph-caret-right" aria-hidden="true"></i></a>`)).join("");
   return `<div class="view-head">
       <h2 class="view-title">${esc(book.name)}</h2>

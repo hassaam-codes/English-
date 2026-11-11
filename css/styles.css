@@ -634,3 +634,75 @@ html.is-ai main { padding-bottom: 0; }
 @media (max-height: 640px) { .ai-fine { display: none; } .ai-head { padding-top: 4px; } }
 @media (min-width: 960px) { #view-ai:not([hidden]) { height: calc(100dvh - 56px - var(--tabbar-h) - 56px); } }
 @media (prefers-reduced-motion: reduce) { .ai-wait span { animation: none; } .ai-msg { animation: none; } }
+
+
+/* =====================================================================
+   Polish pass. The bottom nav bar is deliberately not touched here.
+   ===================================================================== */
+
+/* Shadows carry the navy of the ink instead of plain black, and all fall from the same light (above). */
+:root { --shadow: 0 10px 28px rgba(22, 40, 92, 0.09); --shadow-sm: 0 1px 2px rgba(22, 40, 92, 0.07); --sheet-r: 22px; }
+
+/* Type: no lonely last words, steady digits, headings that sit tight */
+h1, h2, h3, .view-title, .flow-title, .hub-name, .list-title { text-wrap: balance; }
+p, .hub-sub, .chapter-meta, .view-lead, li { text-wrap: pretty; }
+body { font-variant-numeric: tabular-nums; }
+.view-title { letter-spacing: -0.028em; }
+.view-lead { max-width: 62ch; line-height: 1.55; }
+.chapter-kicker { letter-spacing: 0.01em; }
+#rep-source { margin: 0 0 -6px; }
+
+/* Paper grain: a still, very faint tooth over the ruled lines so flat colour does not look sterile */
+.grain {
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.05; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+:root[data-theme="dark"] .grain { mix-blend-mode: screen; opacity: 0.035; filter: invert(1); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .grain { mix-blend-mode: screen; opacity: 0.035; filter: invert(1); } }
+
+/* Lists are one sheet with ruled rows, not a stack of separate boxes */
+.hub, .chapter-list, .note-list {
+  gap: 0; border-radius: var(--sheet-r); background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow-sm); overflow: hidden;
+}
+.hub > .hub-row, .chapter-list > .chapter, .note-list > .note {
+  border: 0; border-radius: 0; background: transparent; position: relative;
+}
+.hub > .hub-row { padding: 14px 14px 14px 16px; min-height: 76px; }
+.chapter-list > .chapter { padding: 13px 14px 13px 16px; }
+/* the rule starts under the text, the way a ruled line stops at the margin */
+.hub > .hub-row + .hub-row::before, .chapter-list > .chapter + .chapter::before, .note-list > .note + .note::before {
+  content: ""; position: absolute; top: 0; right: 0; left: 72px; height: 1px; background: var(--line);
+}
+.hub > .hub-row:hover, .chapter-list > .chapter:hover, .note-list > a.note:hover { background: var(--raised); }
+.hub > .hub-row:active, .chapter-list > .chapter:active { transform: none; background: var(--raised); }
+.hub > .hub-row.is-empty { border-style: none; }
+.hub-row:nth-child(6) { --i: 5; }
+.hub-icon, .chapter-file { border-radius: 11px; }
+.hub-name { letter-spacing: -0.015em; }
+.hub-row > i, .chapter > i { font-size: 16px; opacity: 0.8; }
+a.chapter:hover > i { color: var(--accent); transform: translate(2px, -2px); }
+.chapter > i { transition: transform 200ms var(--ease), color 200ms var(--ease); }
+
+/* Single cards that stay cards get the softer corner and the tinted shadow */
+.quiz-link, .search, .rep-card, .qa-item, .pair { box-shadow: var(--shadow-sm); }
+.quiz-link { border-radius: var(--sheet-r); }
+.search { border-radius: 16px; }
+.rep-card { border-radius: 20px; padding: 18px; }
+.rep-card .times { font-family: var(--display); font-weight: 600; letter-spacing: -0.03em; }
+
+/* Home */
+.home-kicker { letter-spacing: 0.02em; }
+.home-sub { max-width: 26ch; }
+
+/* Laptops: the title holds the left of the page and the sections sit to its right, instead of one thin centred column */
+@media (min-width: 960px) {
+  .home { max-width: 1040px; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); column-gap: 72px; align-items: start; padding-top: 72px; }
+  .home-kicker, .home h1, .home-sub { grid-column: 1; }
+  .home .hub { grid-column: 2; grid-row: 1 / span 4; margin-top: 6px; }
+  .home h1 { font-size: clamp(64px, 6.4vw, 88px); line-height: 0.98; margin-bottom: 28px; }
+  .home h1 .inked { display: table; margin-top: 0.04em; }
+  .home-sub { font-size: 20px; max-width: 22ch; }
+  .hub > .hub-row { min-height: 80px; padding: 16px 18px; }
+  .hub > .hub-row + .hub-row::before { left: 78px; }
+}
+@media (prefers-reduced-motion: reduce) { .chapter > i, .hub-row > i { transition: none; } }

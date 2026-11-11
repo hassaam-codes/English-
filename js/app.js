@@ -407,7 +407,8 @@ document.addEventListener("keydown", (e) => {
 const setDeckSeg = segmented($("#deck-filter"), "deck", (v) => buildDeck(v));
 
 /* ---------- Repeated ---------- */
-$("#rep-title").textContent = REPEATED.title;
+$("#rep-title").textContent = "Repeated questions";
+$("#rep-source").textContent = REPEATED.title; // the PDF's own heading, kept word for word
 $("#rep-intro").innerHTML = REPEATED.intro;
 let repKind = "q8";
 function renderRepeated() {
