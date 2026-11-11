@@ -63,7 +63,7 @@
     <div class="brand">${LOGO}<span>9th English</span></div>
     <p class="kicker">${esc(book.name)} · ${esc(book.label)}</p>
     <h1>${esc(ch.title)}</h1><div class="rule"></div>
-    ${ch.sections.map((s) => `<section class="sec"><div class="sec-head"><h2>${esc(s.title)}</h2></div>${s.sub ? `<p class="sub">${esc(s.sub)}</p>` : ""}${body(s)}</section>`).join("")}`;
+    ${ch.sections.map((s) => `<section class="sec"><div class="sec-head"><h2>${esc(s.title)}</h2></div>${[].concat(s.sub || []).map((x) => `<p class="sub">${esc(x)}</p>`).join("")}${body(s)}</section>`).join("")}`;
   window.__footer = `9th English — ${book.name} — ${ch.title}`;
   await document.fonts.ready;
   window.__ready = true;

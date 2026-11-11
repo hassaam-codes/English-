@@ -79,7 +79,7 @@ function chapterHTML(book, ch, at) {
   // Flow chapter: the whole thing on one page, in the order of the source, headings in place
   if (ch.flow) {
     return `${head(`#/${book.key}`, book.name, ch.no, ch.title)}${pdf}
-      ${secs.map((s) => `<h3 class="flow-title">${esc(s.title)}</h3>${s.sub ? `<h4 class="flow-sub">${esc(s.sub)}</h4>` : ""}${sectionHTML(s)}`).join("")}
+      ${secs.map((s) => `<h3 class="flow-title">${esc(s.title)}</h3>${[].concat(s.sub || []).map((x) => `<h4 class="flow-sub">${esc(x)}</h4>`).join("")}${sectionHTML(s)}`).join("")}
       ${pager(prev && link(prev), next && link(next), `${idx + 1} / ${book.chapters.length}`)}`;
   }
   // Long chapter, no section chosen: show its contents
