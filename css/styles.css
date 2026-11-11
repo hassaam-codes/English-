@@ -162,17 +162,15 @@ a.chip { display: inline-flex; align-items: center; }
 .notes-table th:first-child { border-radius: 10px 0 0 10px; } .notes-table th:last-child { border-radius: 0 10px 10px 0; }
 .notes-table td { padding: 10px 12px; vertical-align: top; line-height: 1.5; }
 .notes-table tbody tr + tr td { border-top: 1px solid var(--line); }
-/* Urdu sentence with its English, one card each */
+/* Urdu sentence and its English, in the order the source gives them */
 .pairs { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.pair {
-  display: grid; grid-template-columns: 28px 1fr; gap: 8px; padding: 12px 16px 14px 12px; border-radius: 16px;
-  background: var(--card); border: 1px solid var(--line);
-  animation: item-in 360ms var(--ease) both; animation-delay: calc(var(--i, 0) * 30ms);
-}
-.pair-n { font-family: var(--mono); font-size: 12px; color: var(--accent); padding-top: 6px; text-align: right; }
-.pair-body { display: grid; gap: 2px; min-width: 0; }
+.pair { display: grid; gap: 2px; padding: 12px 16px 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
+.pair-n { font-family: var(--mono); font-size: 13px; font-weight: 400; color: var(--accent); }
 .pair-ur { font-family: var(--urdu); font-size: 19px; line-height: 2.1; text-align: right; }
 .pair-en { font-size: 16px; line-height: 1.5; font-weight: 500; }
+.flow-title { margin: 32px 0 12px; font-size: 22px; line-height: 1.2; letter-spacing: -0.01em; font-weight: 500; }
+.view-head + .flow-title, .pdf-link + .flow-title { margin-top: 8px; }
+.flow-sub { margin: -4px 0 12px; font-size: 16px; font-weight: 500; color: var(--text-2); }
 .pdf-link { justify-self: start; margin: -4px 0 16px; }
 
 

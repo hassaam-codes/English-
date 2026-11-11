@@ -10,6 +10,10 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 // "Summary · 12 questions" for the chapter row
 function overview(ch) {
   const secs = ch.sections || [];
+  if (ch.flow) {
+    const n = secs.reduce((t, s) => t + (s.items ? s.items.length : 0), 0);
+    return n ? `${n} sentences` : "";
+  }
   if (secs.length > LONG) {
     const n = secs.reduce((t, s) => t + (s.items ? s.items.length : 0), 0);
     return `${secs.length} sections${n ? ` · ${n} sentences` : ""}`;
@@ -35,9 +39,13 @@ function sectionHTML(s) {
   if (s.kind === "qa") return `<ol class="qa">${s.items.map((it, i) => `<li class="qa-item" style="--i:${Math.min(i, 10)}">
       <p class="qa-q"><span class="qa-n">Q.${i + 1}</span><span${dir}>${esc(it.q)}</span></p>
       <p class="qa-a"${s.urdu ? ' lang="ur" dir="rtl"' : ""}>${esc(it.a)}</p></li>`).join("")}</ol>`;
-  if (s.kind === "pairs") return `<ol class="pairs">${s.items.map((it, i) => `<li class="pair" style="--i:${Math.min(i, 10)}">
-      <span class="pair-n">${i + 1}</span>
-      <span class="pair-body">${it.ur ? `<span class="pair-ur" lang="ur" dir="rtl">${esc(it.ur)}</span>` : ""}${it.en ? `<span class="pair-en">${esc(it.en)}</span>` : ""}</span></li>`).join("")}</ol>`;
+  if (s.kind === "pairs") return `<ol class="pairs">${s.items.map((it, i) => {
+      // Number exactly as the source prints it; if the source has none, none is shown.
+      const n = it.n !== undefined ? it.n : `${i + 1}.`;
+      const ur = it.ur ? `<span class="pair-ur" lang="ur" dir="rtl">${esc(it.ur)}</span>` : "";
+      const en = it.en ? `<span class="pair-en">${n ? `<span class="pair-n">${esc(n)}</span> ` : ""}${esc(it.en)}</span>` : "";
+      return `<li class="pair">${it.enFirst ? en + ur : ur + en}</li>`;
+    }).join("")}</ol>`;
   if (s.kind === "list") return `<ul class="prose-list"${s.urdu ? ' lang="ur" dir="rtl"' : ""}>${s.items.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
   if (s.kind === "table") return `<div class="table-wrap"><table class="notes-table">
       ${s.head ? `<thead><tr>${s.head.map((h) => `<th>${esc(h)}</th>`).join("")}</tr></thead>` : ""}
@@ -47,7 +55,7 @@ function sectionHTML(s) {
 
 function chapterHTML(book, ch, at) {
   const secs = ch.sections || [];
-  const long = secs.length > LONG;
+  const long = secs.length > LONG && !ch.flow;
   const idx = book.chapters.indexOf(ch), prev = book.chapters[idx - 1], next = book.chapters[idx + 1];
   const link = (c) => `#/${book.key}/${encodeURIComponent(c.id)}`;
   const head = (backHref, backText, kicker, title) => `<div class="view-head">
@@ -62,6 +70,12 @@ function chapterHTML(book, ch, at) {
     </div>`;
   const pdf = ch.pdf ? `<a class="btn btn-ghost btn-sm pdf-link" href="${esc(ch.pdf)}" download><i class="ph ph-download-simple" aria-hidden="true"></i><span>Download PDF</span></a>` : "";
 
+  // Flow chapter: the whole thing on one page, in the order of the source, headings in place
+  if (ch.flow) {
+    return `${head(`#/${book.key}`, book.name, ch.no, ch.title)}${pdf}
+      ${secs.map((s) => `<h3 class="flow-title">${esc(s.title)}</h3>${s.sub ? `<h4 class="flow-sub">${esc(s.sub)}</h4>` : ""}${sectionHTML(s)}`).join("")}
+      ${pager(prev && link(prev), next && link(next), `${idx + 1} / ${book.chapters.length}`)}`;
+  }
   // Long chapter, no section chosen: show its contents
   if (long && at === null) {
     return `${head(`#/${book.key}`, book.name, ch.no, ch.title)}${pdf}
@@ -97,7 +111,7 @@ function render() {
   const at = sec === undefined || sec === "" || isNaN(+sec) ? null : +sec;
   box.innerHTML = ch ? chapterHTML(book, ch, at) : listHTML(book);
   // New chapter or back to the list: start at the top. Switching section keeps your place.
-  const where = `${key}/${ch ? ch.id : ""}/${ch && (ch.sections || []).length > LONG ? at : ""}`;
+  const where = `${key}/${ch ? ch.id : ""}/${ch && !ch.flow && (ch.sections || []).length > LONG ? at : ""}`;
   if (where !== last) window.scrollTo(0, 0);
   else box.querySelector('.chip[aria-current="true"]')?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", inline: "center", block: "nearest" });
   last = where;
