@@ -21,6 +21,7 @@
 //
 // A long chapter can live in its own file under js/book/ and be imported here.
 import tenses from "./book/tenses.js";
+import pastTenses from "./book/past-tenses.js";
 import futureTenses from "./book/future-tenses.js";
 
 export const ENGLISH_A = {
@@ -36,5 +37,5 @@ export const ENGLISH_B = {
   name: "English B",
   label: "Grammar",
   about: "Grammar topics with rules and examples",
-  chapters: [tenses, futureTenses],
+  chapters: [tenses, pastTenses, futureTenses],
 };
