@@ -1,5 +1,6 @@
 import { ROMAN } from "./data.js";
 import { loadContent } from "./content.js";
+import "./library.js"; // English A and English B
 import "./notes.js"; // Notes page and admin panel (listen for the view-change event)
 
 // Content comes from Supabase when it is set up, otherwise from the copy built into the site.
@@ -116,7 +117,6 @@ document.addEventListener("click", (e) => {
 
 /* ---------- Home ---------- */
 $("#hero-title").textContent = COVER.title;
-$("#hero-sub").textContent = COVER.subtitle;
 
 /* ---------- Papers ---------- */
 const paperState = { idx: 0, section: "q8", q: "" };
@@ -427,7 +427,7 @@ $("#rep-list").addEventListener("click", (e) => {
 });
 
 /* ---------- Router + tab bar ---------- */
-const ORDER = ["home", "papers", "practice", "repeated", "notes", "admin"];
+const ORDER = ["home", "a", "practice", "b", "papers", "repeated", "notes", "admin"];
 let current = null;
 function writeHash() {
   const h = `#/papers/${PAPERS[paperState.idx].id}/${paperState.section}`;

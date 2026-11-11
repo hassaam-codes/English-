@@ -5,15 +5,19 @@ A static website for the Q.8 (Urdu to English translation) and Q.9 (change the v
 All question text is copied exactly from `assets/Past_papers.pdf` and lives in `js/data.js`.
 
 ## Features
-Built mobile first, like an app, with a bottom tab bar:
-- **Home:** kept deliberately bare: the title, one line, and a Start practice button.
-- **Papers:** pick a paper from the chip row or swipe left and right between papers. Switch between Q.8, Q.9 and the English medium question. Tick sentences you have practised. Search every paper in English or Urdu.
-- **Practice:** a flashcard deck for Q.8, Q.9 or only repeated questions. Tap a card to flip it and see the answer. Swipe right if you can do it, left to see it again later.
-- **Answers:** suggested answers live in `js/answers.js` (they are not from the board or the source PDF). In Papers, tap a sentence to show its answer.
-- **Repeated:** every repeated question with how many times it came, each paper tappable.
-- **Notes:** PDFs and images uploaded by the admin, listed for students to open.
-- **Admin (`/#/admin`):** sign in (username and password in `js/config.js`) to upload notes with a title, or delete them. Files are kept in Supabase Storage; see `supabase/README.md`.
-- Progress is saved on the device. Light and dark themes, reduced-motion support, PDF download.
+A 9th class English site, built mobile first like an app.
+
+- **Home:** the list of sections.
+- **English A (textbook):** chapters, each with its summary, question answers and other sections. Content lives in `js/book.js` and is copied word for word from the notes PDFs.
+- **English B (grammar):** grammar topics, in the same format.
+- **Past papers:** the ten Lahore Board papers 2022 to 2026 (Q.8 and Q.9) with suggested answers; swipe between papers, search in English or Urdu, tick what you have practised.
+- **Practice (round button):** flashcards for Q.8, Q.9 or only repeated questions. Tap to flip for the answer, swipe right if you know it.
+- **Repeated questions:** every question asked in more than one paper.
+- **Notes:** files uploaded from the admin page (`/#/admin`).
+- Light and dark themes, reduced-motion support, a designed PDF of the papers.
+
+### Adding a chapter
+Open `js/book.js`. The comment at the top shows the shape of a chapter. Sections can be text (`paras`), question answers (`qa`), a list or a table, in English or Urdu.
 
 ## Run locally
 No build step. Serve the folder with any static server:
@@ -44,6 +48,8 @@ Content can be served from Supabase (read-only for the public). See [`supabase/R
 - `css/styles.css`: design tokens, layout, motion
 - `js/data.js`: all paper text (edit here to add a new year)
 - `js/app.js`: the app (tabs, papers, practice deck, search, theme)
+- `js/book.js`: English A and English B content
+- `js/library.js`: chapter lists and chapter pages
 - `js/content.js`: loads content from Supabase, with a saved copy and the built-in copy as fallbacks
 - `js/config.js`: Supabase URL and publishable key, admin username and password
 - `js/supabase.js`: list, upload and delete files in the notes storage bucket

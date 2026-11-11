@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>9th English Past Papers</title>
+  <title>9th Class English</title>
   <meta name="description" content="9th Class English, Lahore Board past papers 2022 to 2026 (Group I and Group II). Practise Q.8 Urdu to English translation and Q.9 change the voice, with every repeated question." />
   <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#141415" media="(prefers-color-scheme: dark)" />
@@ -34,7 +34,7 @@
           <path d="M38.75 28v8c0 10-6.5 15.75-16.5 15.75"/>
         </g>
       </svg>
-      <span class="brand-text">English Papers</span>
+      <span class="brand-text">9th English</span>
     </a>
     <div class="topbar-actions">
       <a class="icon-btn" href="#/papers/search" aria-label="Search all papers"><i class="ph ph-magnifying-glass" aria-hidden="true"></i></a>
@@ -47,10 +47,19 @@
     <section class="view" id="view-home" data-view="home" aria-labelledby="hero-title">
       <div class="home">
         <h1 id="hero-title"></h1>
-        <p class="home-sub" id="hero-sub"></p>
-        <a class="btn btn-primary home-cta" href="#/practice"><span>Start practice</span><i class="ph ph-arrow-right" aria-hidden="true"></i></a>
+        <nav class="hub" aria-label="Sections">
+          <a class="hub-row" href="#/a"><span class="hub-icon"><i class="ph ph-book-open" aria-hidden="true"></i></span><span><span class="hub-name">English A</span><span class="hub-sub">Textbook: chapters, summaries, question answers</span></span><i class="ph ph-caret-right" aria-hidden="true"></i></a>
+          <a class="hub-row" href="#/b"><span class="hub-icon"><i class="ph ph-text-aa" aria-hidden="true"></i></span><span><span class="hub-name">English B</span><span class="hub-sub">Grammar</span></span><i class="ph ph-caret-right" aria-hidden="true"></i></a>
+          <a class="hub-row" href="#/papers"><span class="hub-icon"><i class="ph ph-files" aria-hidden="true"></i></span><span><span class="hub-name">Past papers</span><span class="hub-sub">2022 to 2026, with answers</span></span><i class="ph ph-caret-right" aria-hidden="true"></i></a>
+          <a class="hub-row" href="#/repeated"><span class="hub-icon"><i class="ph ph-repeat" aria-hidden="true"></i></span><span><span class="hub-name">Repeated questions</span><span class="hub-sub">Asked in more than one paper</span></span><i class="ph ph-caret-right" aria-hidden="true"></i></a>
+          <a class="hub-row" href="#/notes"><span class="hub-icon"><i class="ph ph-notebook" aria-hidden="true"></i></span><span><span class="hub-name">Notes</span><span class="hub-sub">Files to open or download</span></span><i class="ph ph-caret-right" aria-hidden="true"></i></a>
+        </nav>
       </div>
     </section>
+
+    <!-- ENGLISH A (textbook) and ENGLISH B (grammar): filled in by js/library.js from js/book.js -->
+    <section class="view" id="view-a" data-view="a" hidden aria-label="English A"></section>
+    <section class="view" id="view-b" data-view="b" hidden aria-label="English B"></section>
 
     <!-- PAPERS -->
     <section class="view" id="view-papers" data-view="papers" hidden aria-label="Papers">
@@ -179,10 +188,10 @@
   <nav class="tabbar" aria-label="Main">
     <svg class="tabbar-bg" aria-hidden="true" focusable="false"><path /></svg>
     <a class="tab" href="#/home" data-tab="home"><i class="ph ph-house" data-icon="house" aria-hidden="true"></i><span>Home</span></a>
-    <a class="tab" href="#/papers" data-tab="papers"><i class="ph ph-files" data-icon="files" aria-hidden="true"></i><span>Papers</span></a>
+    <a class="tab" href="#/a" data-tab="a"><i class="ph ph-book-open" data-icon="book-open" aria-hidden="true"></i><span>English A</span></a>
     <span class="tab-gap" aria-hidden="true"></span>
-    <a class="tab" href="#/repeated" data-tab="repeated"><i class="ph ph-repeat" data-icon="repeat" aria-hidden="true"></i><span>Repeated</span></a>
-    <a class="tab" href="#/notes" data-tab="notes"><i class="ph ph-notebook" data-icon="notebook" aria-hidden="true"></i><span>Notes</span></a>
+    <a class="tab" href="#/b" data-tab="b"><i class="ph ph-text-aa" data-icon="text-aa" aria-hidden="true"></i><span>English B</span></a>
+    <a class="tab" href="#/papers" data-tab="papers"><i class="ph ph-files" data-icon="files" aria-hidden="true"></i><span>Papers</span></a>
     <a class="fab" href="#/practice" data-tab="practice" aria-label="Practice"><i class="ph ph-cards" aria-hidden="true"></i></a>
   </nav>
 
