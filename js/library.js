@@ -22,10 +22,16 @@ function overview(ch) {
 }
 
 function listHTML(book) {
-  const rows = book.chapters.map((ch, i) => `<a class="chapter" style="--i:${Math.min(i, 10)}" href="#/${book.key}/${encodeURIComponent(ch.id)}">
+  const rows = book.chapters.map((ch, i) => (ch.fileOnly && ch.pdf
+    // A file, not a page: the row opens the PDF itself
+    ? `<a class="chapter" style="--i:${Math.min(i, 10)}" href="${esc(ch.pdf)}" target="_blank" rel="noopener">
+      <span class="chapter-no chapter-file"><i class="ph ph-file-pdf" aria-hidden="true"></i></span>
+      <span><span class="chapter-title">${esc(ch.title)}</span><span class="chapter-meta">PDF</span></span>
+      <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>`
+    : `<a class="chapter" style="--i:${Math.min(i, 10)}" href="#/${book.key}/${encodeURIComponent(ch.id)}">
       <span class="chapter-no">${esc(ch.no || i + 1)}</span>
       <span><span class="chapter-title">${esc(ch.title)}</span><span class="chapter-meta">${esc(overview(ch))}</span></span>
-      <i class="ph ph-caret-right" aria-hidden="true"></i></a>`).join("");
+      <i class="ph ph-caret-right" aria-hidden="true"></i></a>`)).join("");
   return `<div class="view-head">
       <h2 class="view-title">${esc(book.name)}</h2>
       <p class="view-lead">${esc(book.label)}</p>
@@ -106,7 +112,7 @@ function render() {
   const book = BOOKS[key];
   if (!book) { last = ""; return; }
   const box = document.getElementById(`view-${key}`);
-  const ch = id && book.chapters.find((c) => c.id === decodeURIComponent(id));
+  const ch = id && book.chapters.find((c) => c.id === decodeURIComponent(id) && !c.fileOnly); // file-only entries have no page
   if (id && !ch) { history.replaceState(null, "", `#/${key}`); }
   const at = sec === undefined || sec === "" || isNaN(+sec) ? null : +sec;
   box.innerHTML = ch ? chapterHTML(book, ch, at) : listHTML(book);

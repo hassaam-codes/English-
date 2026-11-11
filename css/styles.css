@@ -136,6 +136,7 @@ main { padding: 0 16px calc(var(--tabbar-h) + var(--safe-b) + 48px); max-width: 
 .chapter:hover { background: var(--raised); }
 .chapter:active { transform: scale(0.99); }
 .chapter-no { min-width: 44px; height: 32px; padding: 0 8px; border-radius: 8px; display: grid; place-items: center; font-family: var(--mono); font-size: 12px; background: var(--raised); color: var(--text-2); white-space: nowrap; }
+.chapter-file { min-width: 44px; height: 44px; border-radius: 12px; font-size: 22px; background: var(--accent-soft); color: var(--accent); }
 .chapter-title { display: block; font-size: 16px; font-weight: 500; line-height: 1.35; overflow-wrap: anywhere; }
 .chapter-meta { display: block; margin-top: 2px; font-size: 13px; color: var(--muted); }
 .chapter > i { font-size: 18px; color: var(--muted); }
