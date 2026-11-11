@@ -1,6 +1,6 @@
 // Copied word for word from the notes PDF "tenses" (12 pages), in the PDF's own order.
 // Shown on the site as a file only (fileOnly): the row opens the PDF, there is no page for it.
-// The sentences below are kept so tools/make-notes-pdf.js can rebuild that PDF.
+// The sentences below are kept so tools/make-notes-pdf.cjs can rebuild that PDF.
 // The chapter title was changed from "TENSES" to "PRESENT TENSES" at the owner's request.
 // Headings, numbering ("1.", "12:", or none), spellings and which line comes first are all as in the source.
 export default {

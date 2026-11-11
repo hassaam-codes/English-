@@ -20,7 +20,7 @@ A 9th class English site, built mobile first like an app.
 ### Adding a chapter
 Open `js/book.js`. The comment at the top shows the shape of a chapter. Sections can be text (`paras`), question answers (`qa`), Urdu with English (`pairs`), a list or a table. A long chapter can live in its own file under `js/book/` (see `js/book/tenses.js`). Chapters with more than six sections get a contents page. An entry marked `fileOnly` with a `pdf` path has no page: its row just opens the PDF (this is how PRESENT TENSES is shown).
 
-To build the designed PDF for a chapter: `node tools/make-notes-pdf.js b tenses assets/notes/Present_Tenses.pdf`, then set the chapter's `pdf` field to that path.
+To build the designed PDF for a chapter: `node tools/make-notes-pdf.cjs b tenses assets/notes/Present_Tenses.pdf`, then set the chapter's `pdf` field to that path.
 
 ## Design
 One direction, from the subject's own world: exam ink on ruled paper.
@@ -47,7 +47,7 @@ Content can be served from Supabase (read-only for the public). See [`supabase/R
 ## PDF
 - `assets/English_Papers_2022-2026.pdf`: the designed PDF (what the Download button gives)
 - `assets/Past_papers.pdf`: the original source PDF
-- Rebuild after editing `js/data.js`: `npm i playwright && node tools/make-pdf.js` (template: `tools/pdf.html`)
+- Rebuild after editing `js/data.js`: `npm i playwright && node tools/make-pdf.cjs` (template: `tools/pdf.html`)
 
 ## Logo
 - `assets/logo.svg`: the mark (a sheet of paper with a folded corner and a 9)
@@ -65,3 +65,17 @@ Content can be served from Supabase (read-only for the public). See [`supabase/R
 - `js/config.js`: Supabase URL and publishable key, admin username and password
 - `js/supabase.js`: list, upload and delete files in the notes storage bucket
 - `js/notes.js`: the Notes page and the admin panel
+
+## Ask AI (chat page)
+
+`#/ai` is a chat where students ask questions. The answer comes from Claude, which is given everything on the site
+(English A, English B, past papers, repeated questions) and can also read a note uploaded in the admin page.
+
+- Browser code: `js/ai.js`. Server code: `api/chat.js` (a Vercel function) and `api/_knowledge.js` (turns `js/data.js`,
+  `js/answers.js` and `js/book.js` into text, so new chapters are known after the next deploy).
+- **The API key is never in the code.** In Vercel: Project → Settings → Environment Variables → add
+  `ANTHROPIC_API_KEY` → Save → Redeploy. Get a key at https://platform.claude.com (API keys), and set a monthly
+  spend limit there.
+- Optional variable `AI_MODEL` picks the Claude model (default `claude-opus-5-5`; `claude-haiku-5-5` is far cheaper).
+- Limits built in: 20 questions per visitor per 10 minutes, 2,000 characters per question, requests only from the site itself.
+- The static preview (`python3 -m http.server`) has no `/api`, so the chat shows "not set up" there. Use `vercel dev` to try it locally.

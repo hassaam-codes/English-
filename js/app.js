@@ -4,6 +4,7 @@ import { BOOK_PDF } from "./config.js";
 import { configured, getBooks } from "./supabase.js";
 import "./library.js"; // English A and English B
 import "./notes.js"; // Notes page and admin panel (listen for the view-change event)
+import "./ai.js"; // Ask AI chat page
 
 // Content comes from Supabase when it is set up, otherwise from the copy built into the site.
 const { COVER, PAPERS, REPEATED, Q8_HEADING, Q9_HEADING, ALT_HEADING, ANSWERS, source: CONTENT_SOURCE } = await loadContent();
@@ -428,7 +429,7 @@ $("#rep-list").addEventListener("click", (e) => {
 });
 
 /* ---------- Router + tab bar ---------- */
-const ORDER = ["home", "a", "book", "b", "papers", "practice", "repeated", "notes", "admin"];
+const ORDER = ["home", "a", "book", "b", "papers", "practice", "repeated", "notes", "ai", "admin"];
 let current = null;
 function writeHash() {
   const h = `#/papers/${PAPERS[paperState.idx].id}/${paperState.section}`;
@@ -464,6 +465,7 @@ function route() {
   });
   window.scrollTo(0, 0);
   document.documentElement.classList.toggle("is-practice", view === "practice");
+  document.documentElement.classList.toggle("is-ai", view === "ai");
   document.documentElement.classList.toggle("is-home", view === "home");
   current = view;
   document.dispatchEvent(new CustomEvent("view-change", { detail: view }));

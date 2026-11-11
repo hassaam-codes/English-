@@ -1,5 +1,5 @@
 // Rebuilds assets/English_Papers_2022-2026.pdf from js/data.js.
-// Usage (from the repo root):  node tools/make-pdf.js      (needs: npm i playwright)
+// Usage (from the repo root):  node tools/make-pdf.cjs      (needs: npm i playwright)
 const { chromium } = require("playwright");
 const http = require("http");
 const fs = require("fs");

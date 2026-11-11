@@ -1,5 +1,5 @@
 // Builds supabase/setup.sql (tables + read-only access + all content) from js/data.js and js/answers.js.
-// Usage (from the repo root):  node tools/make-seed.js
+// Usage (from the repo root):  node tools/make-seed.cjs
 // Paste the output file into the Supabase SQL Editor and press Run. It is safe to run more than once:
 // existing rows are left alone, so edits made in Supabase are never overwritten.
 const fs = require("fs");
