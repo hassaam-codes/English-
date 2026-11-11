@@ -1,7 +1,7 @@
 -- English Papers: storage for the textbook PDF uploaded from the admin page.
 -- Paste into Supabase > SQL Editor > New query, then press Run. Safe to run again.
 --
--- One public bucket that holds a single PDF of up to 50 MB (the Supabase free plan's limit per file).
+-- One public bucket that holds Book A and Book B, each a PDF of up to 50 MB (the Supabase free plan's limit per file).
 -- Like the notes bucket, it accepts uploads and deletes from the website, limited to PDFs in this bucket only.
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)

@@ -61,10 +61,10 @@
     <section class="view" id="view-a" data-view="a" hidden aria-label="English A"></section>
     <section class="view" id="view-b" data-view="b" hidden aria-label="English B"></section>
 
-    <!-- BOOK: shown only until the textbook PDF is added (then the round button opens the PDF itself) -->
-    <section class="view" id="view-book" data-view="book" hidden aria-label="Book">
-      <div class="view-head"><h2 class="view-title">Book</h2></div>
-      <div class="empty"><i class="ph ph-book-bookmark" aria-hidden="true"></i><p>The book PDF is being added</p></div>
+    <!-- BOOKS: Book A and Book B, uploaded from the admin page -->
+    <section class="view" id="view-book" data-view="book" hidden aria-label="Books">
+      <div class="view-head"><h2 class="view-title">Books</h2></div>
+      <div class="hub" id="book-list"></div>
     </section>
 
     <!-- PAPERS -->
@@ -177,18 +177,32 @@
       </form>
 
       <div id="admin-panel" hidden>
-        <form class="panel form" id="book-form" novalidate>
-          <p class="panel-title">Book PDF</p>
-          <p class="panel-text" id="book-status">Checking</p>
+        <form class="panel form book-form" data-book="a" novalidate>
+          <p class="panel-title">Book A PDF</p>
+          <p class="panel-text book-status">Checking</p>
           <div class="field">
-            <label for="book-file">File</label>
-            <input id="book-file" name="file" type="file" accept="application/pdf" required />
+            <label for="book-file-a">File</label>
+            <input id="book-file-a" name="file" type="file" accept="application/pdf" required />
             <p class="field-help">One PDF, up to 50 MB. Uploading a new one replaces the old one</p>
           </div>
-          <p class="form-error" id="book-error" role="alert" hidden></p>
+          <p class="form-error book-error" role="alert" hidden></p>
           <div class="form-row">
-            <button class="btn btn-primary" type="submit" id="book-btn"><i class="ph ph-upload-simple" aria-hidden="true"></i><span>Upload book</span></button>
-            <button class="btn btn-ghost" type="button" id="book-remove" hidden>Remove</button>
+            <button class="btn btn-primary book-btn" type="submit"><i class="ph ph-upload-simple" aria-hidden="true"></i><span>Upload Book A</span></button>
+            <button class="btn btn-ghost book-remove" type="button" hidden>Remove</button>
+          </div>
+        </form>
+        <form class="panel form book-form" data-book="b" novalidate>
+          <p class="panel-title">Book B PDF</p>
+          <p class="panel-text book-status">Checking</p>
+          <div class="field">
+            <label for="book-file-b">File</label>
+            <input id="book-file-b" name="file" type="file" accept="application/pdf" required />
+            <p class="field-help">One PDF, up to 50 MB. Uploading a new one replaces the old one</p>
+          </div>
+          <p class="form-error book-error" role="alert" hidden></p>
+          <div class="form-row">
+            <button class="btn btn-primary book-btn" type="submit"><i class="ph ph-upload-simple" aria-hidden="true"></i><span>Upload Book B</span></button>
+            <button class="btn btn-ghost book-remove" type="button" hidden>Remove</button>
           </div>
         </form>
         <form class="panel form" id="upload-form" novalidate>
@@ -218,7 +232,7 @@
     <span class="tab-gap" aria-hidden="true"></span>
     <a class="tab" href="#/b" data-tab="b"><i class="ph ph-text-aa" data-icon="text-aa" aria-hidden="true"></i><span>English B</span></a>
     <a class="tab" href="#/papers" data-tab="papers"><i class="ph ph-files" data-icon="files" aria-hidden="true"></i><span>Papers</span></a>
-    <a class="fab" href="#/book" data-tab="book" aria-label="Book PDF"><i class="ph ph-book-bookmark" aria-hidden="true"></i></a>
+    <a class="fab" href="#/book" data-tab="book" aria-label="Books"><i class="ph ph-book-bookmark" aria-hidden="true"></i></a>
   </nav>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>

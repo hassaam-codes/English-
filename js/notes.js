@@ -1,6 +1,6 @@
 // Public Notes page and the admin panel (sign in, upload, delete).
 import { ADMIN_USERNAME, ADMIN_PASSWORD } from "./config.js";
-import { configured, listNotes, uploadNote, deleteNote, publicUrl, getBook, uploadBook, removeBook } from "./supabase.js";
+import { configured, listNotes, uploadNote, deleteNote, publicUrl, getBooks, uploadBook, removeBook } from "./supabase.js";
 
 // Simple lock: the username and password live in config.js and are checked here in the browser.
 const SIGNED_IN = "lb9-admin";
@@ -117,44 +117,55 @@ $("#admin-notes").addEventListener("click", async (e) => {
   catch (ex) { b.disabled = false; toast(ex.message || "Could not delete"); }
 });
 
-/* ---------- Book PDF ---------- */
+/* ---------- Book A and Book B ---------- */
 const BOOK_MAX = 50 * 1024 * 1024;
-const bookChanged = (book) => document.dispatchEvent(new CustomEvent("book-change", { detail: book }));
+const BOOK_NAME = { a: "Book A", b: "Book B" };
+const booksChanged = (books) => document.dispatchEvent(new CustomEvent("books-change", { detail: books }));
 const bookMissing = (e) => /bucket/i.test(e.message || "") || e.status === 404
   ? "Book storage is not set up yet. Run supabase/book.sql in Supabase first" : e.message || "Something went wrong. Try again";
 
 async function loadBookStatus() {
-  const st = $("#book-status"), rm = $("#book-remove");
+  const forms = [...document.querySelectorAll(".book-form")];
   try {
-    const b = await getBook();
-    st.innerHTML = b ? `Current book: <a href="${esc(b.url)}" target="_blank" rel="noopener">open it</a> · ${esc([size(b.size), day(b.created_at)].filter(Boolean).join(" · "))}` : "No book uploaded yet";
-    rm.hidden = !b;
-  } catch (e) { st.textContent = bookMissing(e); rm.hidden = true; }
+    const books = await getBooks();
+    for (const f of forms) {
+      const b = books[f.dataset.book];
+      f.querySelector(".book-status").innerHTML = b
+        ? `Current file: <a href="${esc(b.url)}" target="_blank" rel="noopener">open it</a> · ${esc([size(b.size), day(b.created_at)].filter(Boolean).join(" · "))}` : "Nothing uploaded yet";
+      f.querySelector(".book-remove").hidden = !b;
+    }
+    return books;
+  } catch (e) {
+    for (const f of forms) { f.querySelector(".book-status").textContent = bookMissing(e); f.querySelector(".book-remove").hidden = true; }
+    return null;
+  }
 }
 
-$("#book-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const file = $("#book-file").files[0], err = $("#book-error"), btn = $("#book-btn");
-  say(err, "");
-  if (!file) return say(err, "Choose the book PDF");
-  if (file.type !== "application/pdf") return say(err, "The book must be a PDF");
-  if (file.size > BOOK_MAX) return say(err, `That file is ${size(file.size)}. The limit is 50 MB`);
-  busy(btn, true);
-  btn.querySelector("span").textContent = "Uploading, keep this page open";
-  try {
-    await uploadBook(file);
-    e.target.reset();
-    toast("Book uploaded");
-    await loadBookStatus();
-    bookChanged(await getBook().catch(() => null));
-  } catch (ex) { say(err, bookMissing(ex)); }
-  finally { busy(btn, false); btn.querySelector("span").textContent = "Upload book"; }
-});
-
-$("#book-remove").addEventListener("click", async () => {
-  if (!confirm("Remove the book? The Book button will have nothing to open.")) return;
-  try { await removeBook(); toast("Book removed"); await loadBookStatus(); bookChanged(null); }
-  catch (ex) { toast(bookMissing(ex)); }
+document.querySelectorAll(".book-form").forEach((form) => {
+  const key = form.dataset.book, name = BOOK_NAME[key];
+  const err = form.querySelector(".book-error"), btn = form.querySelector(".book-btn");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const file = form.querySelector('input[type="file"]').files[0];
+    say(err, "");
+    if (!file) return say(err, `Choose the ${name} PDF`);
+    if (file.type !== "application/pdf") return say(err, "The book must be a PDF");
+    if (file.size > BOOK_MAX) return say(err, `That file is ${size(file.size)}. The limit is 50 MB`);
+    busy(btn, true);
+    btn.querySelector("span").textContent = "Uploading, keep this page open";
+    try {
+      await uploadBook(key, file);
+      form.reset();
+      toast(`${name} uploaded`);
+      booksChanged(await loadBookStatus());
+    } catch (ex) { say(err, bookMissing(ex)); }
+    finally { busy(btn, false); btn.querySelector("span").textContent = `Upload ${name}`; }
+  });
+  form.querySelector(".book-remove").addEventListener("click", async () => {
+    if (!confirm(`Remove ${name}? Students will no longer be able to open it.`)) return;
+    try { await removeBook(key); toast(`${name} removed`); booksChanged(await loadBookStatus()); }
+    catch (ex) { toast(bookMissing(ex)); }
+  });
 });
 
 document.addEventListener("view-change", (e) => {

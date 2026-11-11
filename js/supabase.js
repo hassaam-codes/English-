@@ -52,35 +52,37 @@ export async function uploadNote({ title, file }) {
 
 export const deleteNote = (note) => call(`/object/${NOTES_BUCKET}/${encodeURIComponent(note.file_path)}`, { method: "DELETE" });
 
-/* ---------- Book: one PDF in its own bucket. The newest file is the book. ---------- */
+/* ---------- Books: Book A and Book B, one PDF each, in the "book" bucket. ----------
+   Files are named  a_<time>.pdf  and  b_<time>.pdf ; the newest of each letter is that book. */
 export const bookUrl = (name) => `${SUPABASE_URL}/storage/v1/object/public/${BOOK_BUCKET}/${encodeURIComponent(name)}`;
 
-async function listBook() {
+async function listBooks() {
   const rows = await call(`/object/list/${BOOK_BUCKET}`, {
     method: "POST", headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ prefix: "", limit: 100, offset: 0, sortBy: { column: "created_at", order: "desc" } }),
   });
   return (rows || []).filter((r) => r.id && r.name && !r.name.startsWith("."));
 }
+const shape = (b) => (b ? { name: b.name, url: bookUrl(b.name), size: (b.metadata && b.metadata.size) || 0, created_at: b.created_at } : null);
 
-// { name, url, size, created_at } or null
-export async function getBook() {
-  const [b] = await listBook();
-  return b ? { name: b.name, url: bookUrl(b.name), size: (b.metadata && b.metadata.size) || 0, created_at: b.created_at } : null;
+// { a: {name,url,size,created_at} | null, b: ... }
+export async function getBooks() {
+  const all = await listBooks();
+  return { a: shape(all.find((r) => r.name.startsWith("a_"))), b: shape(all.find((r) => r.name.startsWith("b_"))) };
 }
 
-export async function uploadBook(file) {
-  const name = `${Date.now()}_book.pdf`;
+export async function uploadBook(key, file) {
+  const name = `${key}_${Date.now()}.pdf`;
   await call(`/object/${BOOK_BUCKET}/${name}`, {
     method: "POST", body: file, headers: { "Content-Type": "application/pdf", "cache-control": "max-age=3600", "x-upsert": "false" },
   });
-  // Remove older copies so only the new book is kept
-  const old = (await listBook().catch(() => [])).filter((r) => r.name !== name);
+  // Remove older copies of this book so only the new one is kept
+  const old = (await listBooks().catch(() => [])).filter((r) => r.name.startsWith(`${key}_`) && r.name !== name);
   await Promise.all(old.map((r) => call(`/object/${BOOK_BUCKET}/${encodeURIComponent(r.name)}`, { method: "DELETE" }).catch(() => {})));
   return name;
 }
 
-export async function removeBook() {
-  const all = await listBook();
-  await Promise.all(all.map((r) => call(`/object/${BOOK_BUCKET}/${encodeURIComponent(r.name)}`, { method: "DELETE" })));
+export async function removeBook(key) {
+  const mine = (await listBooks()).filter((r) => r.name.startsWith(`${key}_`));
+  await Promise.all(mine.map((r) => call(`/object/${BOOK_BUCKET}/${encodeURIComponent(r.name)}`, { method: "DELETE" })));
 }

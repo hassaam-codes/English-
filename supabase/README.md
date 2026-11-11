@@ -30,14 +30,15 @@ the code can see them, and the storage bucket accepts uploads and deletes from t
 limited to PDFs and images of up to 25 MB, and nothing outside that bucket can be touched.
 If notes are ever tampered with, change the password in `js/config.js`; for a real lock, ask for a proper login.
 
-## Book PDF (round button)
+## Books (round button)
 
-In the admin page there is a **Book PDF** section: choose the textbook PDF (up to 50 MB) and press **Upload book**.
-The round Book button in the bottom bar then opens it for everyone. Uploading again replaces it; **Remove** deletes it.
+The round button in the bottom bar opens a **Books** page with **Book A** and **Book B**.
+In the admin page there is a section for each: choose the PDF (up to 50 MB) and press **Upload**.
+It then opens for everyone. Uploading again replaces that book; **Remove** deletes it. The other book is not touched.
 
 One-time setup: run [`book.sql`](book.sql) in the Supabase SQL Editor. It creates a separate `book` bucket
-(PDF only, 50 MB, which is the free plan's limit per file). If the book is bigger than that, share it from
-Google Drive instead and set that link as `BOOK_PDF` in `js/config.js`.
+(PDF only, 50 MB per file, which is the free plan's limit). If a book is bigger than that, share it from
+Google Drive instead and ask for the link to be set in the code.
 
 ## Editing content
 

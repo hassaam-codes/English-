@@ -1,7 +1,7 @@
 import { ROMAN } from "./data.js";
 import { loadContent } from "./content.js";
 import { BOOK_PDF } from "./config.js";
-import { configured, getBook } from "./supabase.js";
+import { configured, getBooks } from "./supabase.js";
 import "./library.js"; // English A and English B
 import "./notes.js"; // Notes page and admin panel (listen for the view-change event)
 
@@ -469,19 +469,24 @@ function route() {
   current = view;
   document.dispatchEvent(new CustomEvent("view-change", { detail: view }));
 }
-// Round button: opens the uploaded book PDF (or the fallback in config.js). With no book it opens the Book page.
+// Books page (round button): Book A and Book B, uploaded from the admin page.
 (() => {
-  const fab = $(".fab"), KEY = "lb9-book-url";
-  const point = (url) => {
-    if (url) { fab.href = url; fab.target = "_blank"; fab.rel = "noopener"; }
-    else { fab.href = "#/book"; fab.removeAttribute("target"); fab.removeAttribute("rel"); }
+  const KEY = "lb9-books", box = $("#book-list");
+  const row = (name, sub, b) => (b
+    ? `<a class="hub-row" href="${esc(b.url)}" target="_blank" rel="noopener"><span class="hub-icon"><i class="ph ph-file-pdf" aria-hidden="true"></i></span><span><span class="hub-name">${name}</span><span class="hub-sub">${sub} · PDF</span></span><i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>`
+    : `<div class="hub-row is-empty"><span class="hub-icon"><i class="ph ph-hourglass" aria-hidden="true"></i></span><span><span class="hub-name">${name}</span><span class="hub-sub">${sub} · being added</span></span><span></span></div>`);
+  const show = (books) => {
+    const bk = books || {};
+    box.innerHTML = row("Book A", "Textbook", bk.a || (BOOK_PDF ? { url: BOOK_PDF } : null)) + row("Book B", "Grammar", bk.b);
   };
-  const remember = (url) => { try { url ? localStorage.setItem(KEY, url) : localStorage.removeItem(KEY); } catch (e) {} };
+  const remember = (books) => { try { localStorage.setItem(KEY, JSON.stringify(books || {})); } catch (e) {} };
   let saved = null;
-  try { saved = localStorage.getItem(KEY); } catch (e) {}
-  point(saved || BOOK_PDF);                       // instant, from the last visit
-  if (configured()) getBook().then((b) => { remember(b && b.url); point((b && b.url) || BOOK_PDF); }).catch(() => {});
-  document.addEventListener("book-change", (e) => { const u = e.detail && e.detail.url; remember(u); point(u || BOOK_PDF); });
+  try { saved = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) {}
+  show(saved);                                    // instant, from the last visit
+  const refresh = () => { if (configured()) getBooks().then((b) => { remember(b); show(b); }).catch(() => {}); };
+  refresh();
+  document.addEventListener("view-change", (e) => { if (e.detail === "book") refresh(); });
+  document.addEventListener("books-change", (e) => { remember(e.detail); show(e.detail); });
 })();
 window.addEventListener("hashchange", route);
 document.querySelectorAll(".tab, .fab").forEach((t) => t.addEventListener("click", () => buzz()));

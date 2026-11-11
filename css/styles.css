@@ -119,6 +119,9 @@ main { padding: 0 16px calc(var(--tabbar-h) + var(--safe-b) + 48px); max-width: 
 }
 .hub-row:nth-child(2) { --i: 1; } .hub-row:nth-child(3) { --i: 2; } .hub-row:nth-child(4) { --i: 3; } .hub-row:nth-child(5) { --i: 4; }
 .hub-row:hover { background: var(--raised); }
+.hub-row.is-empty { background: transparent; border-style: dashed; }
+.hub-row.is-empty .hub-icon { background: var(--raised); color: var(--muted); }
+.hub-row.is-empty .hub-name { color: var(--text-2); }
 .hub-row:active { transform: scale(0.99); }
 .hub-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 22px; background: var(--accent-soft); color: var(--accent); }
 .hub-name { display: block; font-size: 17px; font-weight: 500; line-height: 1.3; }
