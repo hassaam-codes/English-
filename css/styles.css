@@ -261,7 +261,7 @@ html.is-practice main { padding-bottom: 0; }
   #view-practice .view-head { padding-top: 8px; }
 }
 .fcard {
-  position: absolute; inset: 0; border-radius: 24px; box-shadow: var(--shadow); cursor: pointer;
+  position: absolute; inset: 0; border-radius: 24px; cursor: pointer;
   transform-origin: 50% 100%; touch-action: none; user-select: none; -webkit-user-select: none;
   transition: transform 320ms var(--ease), opacity 320ms var(--ease);
 }
@@ -269,14 +269,25 @@ html.is-practice main { padding-bottom: 0; }
    Only one face is ever displayed. The card turns edge-on, the faces swap, and it turns back.
    This avoids backface-visibility and preserve-3d, which Safari renders unreliably
    (it showed the answer face on top of the question). */
-.f-inner { position: absolute; inset: 0; }
-.f-inner.flip-out { animation: flip-out 180ms cubic-bezier(0.5, 0, 1, 1) both; }
-.f-inner.flip-in { animation: flip-in 260ms var(--ease) both; }
-@keyframes flip-out { to { transform: rotateY(90deg); } }
-@keyframes flip-in { from { transform: rotateY(-90deg); } }
+.f-inner { position: absolute; inset: 0; will-change: transform; }
+/* perspective() lives inside the transform so the turn has real depth in every browser. */
+.f-inner.flip-out { animation: flip-out 200ms cubic-bezier(0.4, 0, 1, 1) both; }
+.f-inner.flip-in { animation: flip-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes flip-out {
+  from { transform: perspective(1000px) rotateY(0deg) scale(1); }
+  to { transform: perspective(1000px) rotateY(90deg) scale(0.96); }
+}
+@keyframes flip-in {
+  from { transform: perspective(1000px) rotateY(-90deg) scale(0.96); }
+  to { transform: perspective(1000px) rotateY(0deg) scale(1); }
+}
+/* Reduced motion: a quick cross-fade instead of a turn (still shows that the side changed). */
+.f-inner.fade-out { opacity: 0; transition: opacity 120ms linear !important; }
+.f-inner.fade-in { opacity: 1; transition: opacity 160ms linear !important; }
+/* The shadow sits on the face, so it turns with the card instead of staying behind as a flat box. */
 .f-face {
   position: absolute; inset: 0; display: flex; flex-direction: column; padding: 20px 24px; border-radius: 24px;
-  background: var(--card); border: 1px solid var(--line);
+  background: var(--card); border: 1px solid var(--line); box-shadow: var(--shadow);
 }
 .f-back { display: none; background: color-mix(in srgb, var(--accent) 6%, var(--card)); border-color: color-mix(in srgb, var(--accent) 30%, var(--line)); }
 .fcard.flipped .f-front { display: none; }

@@ -287,16 +287,16 @@ function flipTop() {
     top.querySelector(".f-back").setAttribute("aria-hidden", String(!on));
   };
   buzz(6);
-  if (reduceMotion) return swap();
-  // Turn edge-on, swap the visible face, turn back. Timers (not animation events) so it can never get stuck.
   inner.dataset.busy = "1";
-  inner.classList.add("flip-out");
+  // Timers (not animation events) so a flip can never get stuck half way.
+  const [out, back, tOut, tIn] = reduceMotion ? ["fade-out", "fade-in", 120, 170] : ["flip-out", "flip-in", 200, 330];
+  inner.classList.add(out);
   setTimeout(() => {
     swap();
-    inner.classList.remove("flip-out");
-    inner.classList.add("flip-in");
-    setTimeout(() => { inner.classList.remove("flip-in"); delete inner.dataset.busy; }, 270);
-  }, 180);
+    inner.classList.remove(out);
+    inner.classList.add(back);
+    setTimeout(() => { inner.classList.remove(back); delete inner.dataset.busy; }, tIn);
+  }, tOut);
 }
 function renderDeck() {
   const box = $("#deck");
