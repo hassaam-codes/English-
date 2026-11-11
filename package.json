@@ -2,8 +2,7 @@
   "name": "ninth-english",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=20" },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^1.8.0"
+  "engines": {
+    "node": ">=20"
   }
 }

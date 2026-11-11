@@ -68,14 +68,13 @@ Content can be served from Supabase (read-only for the public). See [`supabase/R
 
 ## Ask AI (chat page)
 
-`#/ai` is a chat where students ask questions. The answer comes from Claude, which is given everything on the site
-(English A, English B, past papers, repeated questions) and can also read a note uploaded in the admin page.
+`#/ai` is a chat where students ask questions. Answers come from an AI model on NVIDIA's API (build.nvidia.com),
+which is given the parts of the site's notes that match the question (English A, English B, past papers, repeated questions).
 
 - Browser code: `js/ai.js`. Server code: `api/chat.js` (a Vercel function) and `api/_knowledge.js` (turns `js/data.js`,
-  `js/answers.js` and `js/book.js` into text, so new chapters are known after the next deploy).
+  `js/answers.js` and `js/book.js` into sections and picks the ones a question needs, so new chapters are known after the next deploy).
 - **The API key is never in the code.** In Vercel: Project → Settings → Environment Variables → add
-  `ANTHROPIC_API_KEY` → Save → Redeploy. Get a key at https://platform.claude.com (API keys), and set a monthly
-  spend limit there.
-- Optional variable `AI_MODEL` picks the Claude model (default `claude-opus-5-5`; `claude-haiku-5-5` is far cheaper).
+  `NVIDIA_API_KEY` (the `nvapi-...` key) → Save → Redeploy.
+- Optional variable `AI_MODEL` picks the model (default `meta/llama-3.3-70b-instruct`; any chat model listed on build.nvidia.com).
 - Limits built in: 20 questions per visitor per 10 minutes, 2,000 characters per question, requests only from the site itself.
 - The static preview (`python3 -m http.server`) has no `/api`, so the chat shows "not set up" there. Use `vercel dev` to try it locally.

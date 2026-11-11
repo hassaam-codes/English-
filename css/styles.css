@@ -616,11 +616,6 @@ html.is-ai main { padding-bottom: 0; }
 .ai-wait span:nth-child(3) { animation-delay: 0.3s; }
 @keyframes ai-dot { 0%, 60%, 100% { opacity: 0.3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
 .ai-form { flex: none; display: grid; gap: 8px; padding: 8px 0 10px; }
-.ai-note { display: flex; align-items: center; gap: 6px; justify-self: start; max-width: 100%; height: 36px; padding: 0 6px 0 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--text-2); font-size: 14px; }
-.ai-note.on { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
-.ai-note select { min-width: 0; max-width: 62vw; height: 34px; border: 0; background: transparent; color: inherit; font: inherit; text-overflow: ellipsis; cursor: pointer; }
-.ai-note select:focus-visible { outline: none; }
-.ai-note:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
 .ai-box { display: flex; align-items: flex-end; gap: 8px; padding: 6px 6px 6px 16px; border-radius: 24px; border: 1px solid var(--field-line); background: var(--card); transition: border-color 150ms var(--ease); }
 .ai-box:focus-within { border-color: var(--accent); }
 .ai-box textarea { flex: 1 1 auto; min-width: 0; min-height: 40px; max-height: 132px; padding: 8px 0; border: 0; outline: none; resize: none; background: transparent; color: var(--text); font: inherit; font-size: 16px; line-height: 1.5; }

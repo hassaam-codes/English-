@@ -1,10 +1,8 @@
 // Ask AI: the chat page. The browser only talks to /api/chat on this site; the API key lives on the server (see api/chat.js).
-import { configured, listNotes } from "./supabase.js";
 
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const log = $("#ai-log"), form = $("#ai-form"), input = $("#ai-input"), sendBtn = $("#ai-send"), newBtn = $("#ai-new");
-const noteWrap = $("#ai-note-wrap"), noteSel = $("#ai-note");
 const KEY = "lb9-ai-chat";
 
 const STARTERS = [
@@ -16,8 +14,8 @@ const STARTERS = [
 
 let chat = [];        // [{ role: "user" | "assistant", content, error? }]
 let busy = null;      // AbortController while an answer is arriving
-try { const saved = JSON.parse(sessionStorage.getItem(KEY) || "null"); if (saved && Array.isArray(saved.chat)) { chat = saved.chat; if (saved.note) noteSel.dataset.want = saved.note; } } catch (e) {}
-const remember = () => { try { sessionStorage.setItem(KEY, JSON.stringify({ chat: chat.filter((m) => !m.error), note: noteSel.value })); } catch (e) {} };
+try { const saved = JSON.parse(sessionStorage.getItem(KEY) || "null"); if (saved && Array.isArray(saved.chat)) { chat = saved.chat; } } catch (e) {}
+const remember = () => { try { sessionStorage.setItem(KEY, JSON.stringify({ chat: chat.filter((m) => !m.error) })); } catch (e) {} };
 
 /* ---------- Small, safe formatter: paragraphs, lists, **bold**, `code`. Everything is escaped first. ---------- */
 const URDU = /[؀-ۿݐ-ݿﭐ-﷿ﹰ-﻿]/;
@@ -95,7 +93,7 @@ async function ask(text) {
   try {
     const res = await fetch("/api/chat", {
       method: "POST", headers: { "Content-Type": "application/json" }, signal: ctrl.signal,
-      body: JSON.stringify({ messages: history, note: noteSel.value || undefined }),
+      body: JSON.stringify({ messages: history }),
     });
     if (!res.ok || !res.body) {
       let msg = res.status === 404 ? "The AI helper is not set up on this copy of the site yet." : "The AI helper could not be reached. Try again.";
@@ -153,27 +151,11 @@ log.addEventListener("click", (e) => {
   if (s) return ask(s.dataset.ask);
   if (e.target.closest("[data-retry]")) ask("");
 });
-newBtn.addEventListener("click", () => { if (busy) busy.abort(); chat = []; noteSel.value = ""; noteWrap.classList.remove("on"); draw(); remember(); input.focus(); });
-noteSel.addEventListener("change", () => { noteWrap.classList.toggle("on", !!noteSel.value); remember(); });
-
-// Notes uploaded in the admin page can be attached, so the AI reads that file too.
-let notesLoaded = false;
-async function loadNotes() {
-  if (notesLoaded || !configured()) return;
-  notesLoaded = true;
-  try {
-    const notes = (await listNotes()).filter((n) => n.file_type === "application/pdf" || (n.file_type || "").startsWith("image/"));
-    if (!notes.length) return;
-    noteSel.innerHTML = '<option value="">No note attached</option>' + notes.map((n) => `<option value="${esc(n.file_path)}">${esc(n.title)}</option>`).join("");
-    if (noteSel.dataset.want) noteSel.value = noteSel.dataset.want;
-    noteWrap.classList.toggle("on", !!noteSel.value);
-    noteWrap.hidden = false;
-  } catch (e) { notesLoaded = false; }
-}
+newBtn.addEventListener("click", () => { if (busy) busy.abort(); chat = []; draw(); remember(); input.focus(); });
 
 document.addEventListener("view-change", (e) => {
   if (e.detail !== "ai") return;
-  draw(); loadNotes();
+  draw();
   if (matchMedia("(pointer: fine)").matches) input.focus({ preventScroll: true });
 });
 draw();

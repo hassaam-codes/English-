@@ -1,5 +1,5 @@
 {
   "functions": {
-    "api/chat.js": { "maxDuration": 60, "includeFiles": "js/**" }
+    "api/chat.js": { "maxDuration": 60 }
   }
 }
