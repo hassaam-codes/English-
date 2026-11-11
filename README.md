@@ -22,6 +22,14 @@ Open `js/book.js`. The comment at the top shows the shape of a chapter. Sections
 
 To build the designed PDF for a chapter: `node tools/make-notes-pdf.js b tenses assets/notes/Present_Tenses.pdf`, then set the chapter's `pdf` field to that path.
 
+## Design
+One direction, from the subject's own world: exam ink on ruled paper.
+- **Canvas:** a cool paper tint in light mode and deep ink in dark mode, never pure white or black, with faint ruled lines that drift very slowly behind everything.
+- **Signature:** a blue pen stroke. It draws itself under "English" on Home and sits under every page title.
+- **Type:** Bricolage Grotesque for headings, Geist for text, Geist Mono for small labels, Noto Nastaliq Urdu for Urdu.
+- **Accent:** one blue, used for actions and the pen stroke only.
+- Motion eases everywhere, pauses when the tab is hidden, and is switched off for people who ask for reduced motion.
+
 ## Run locally
 No build step. Serve the folder with any static server:
 

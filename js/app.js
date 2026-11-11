@@ -118,7 +118,6 @@ document.addEventListener("click", (e) => {
 });
 
 /* ---------- Home ---------- */
-$("#hero-title").textContent = COVER.title;
 
 /* ---------- Papers ---------- */
 const paperState = { idx: 0, section: "q8", q: "" };
@@ -570,6 +569,9 @@ const sentinel = document.createElement("div");
 sentinel.style.cssText = "position:absolute;top:0;height:1px;width:1px";
 document.body.prepend(sentinel);
 new IntersectionObserver(([en]) => $(".topbar").classList.toggle("scrolled", !en.isIntersecting)).observe(sentinel);
+
+/* ---------- Pause every looping animation while the tab is hidden ---------- */
+document.addEventListener("visibilitychange", () => document.body.classList.toggle("paused", document.hidden));
 
 /* ---------- Theme ---------- */
 const themeBtn = $(".theme-toggle");

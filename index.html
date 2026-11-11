@@ -5,8 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>9th Class English</title>
   <meta name="description" content="9th Class English, Lahore Board past papers 2022 to 2026 (Group I and Group II). Practise Q.8 Urdu to English translation and Q.9 change the voice, with every repeated question." />
-  <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
-  <meta name="theme-color" content="#141415" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f3f5f9" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0f1218" media="(prefers-color-scheme: dark)" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="9th Class English" />
+  <meta property="og:description" content="Textbook question answers, grammar, past papers with answers and a quiz, for 9th class English, Lahore Board." />
+  <!-- DEPLOY STEP: these two need the live address; change them if the site moves -->
+  <meta property="og:url" content="https://english-paper.vercel.app/" />
+  <meta property="og:image" content="https://english-paper.vercel.app/assets/icons/icon-512.png" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="English Papers" />
   <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml" />
@@ -15,7 +21,7 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Noto+Nastaliq+Urdu:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css" />
   <link rel="stylesheet" href="css/styles.css" />
@@ -24,6 +30,8 @@
   </script>
 </head>
 <body>
+  <a class="skip" href="#app">Skip to content</a>
+  <div class="paper-bg" aria-hidden="true"></div>
   <header class="topbar">
     <a class="brand" href="#/home" aria-label="Home">
       <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
@@ -42,11 +50,13 @@
     </div>
   </header>
 
-  <main id="app">
+  <main id="app" tabindex="-1">
     <!-- HOME -->
     <section class="view" id="view-home" data-view="home" aria-labelledby="hero-title">
       <div class="home">
-        <h1 id="hero-title"></h1>
+        <p class="home-kicker">Lahore Board</p>
+        <h1 id="hero-title">9th Class <span class="inked">English<svg class="ink" viewBox="0 0 300 24" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path pathLength="1" d="M4 15 C 52 5, 96 21, 150 12 S 246 5, 296 13" /></svg></span></h1>
+        <p class="home-sub">Textbook, grammar and past papers in one place</p>
         <nav class="hub" aria-label="Sections">
           <a class="hub-row" href="#/a"><span class="hub-icon"><i class="ph ph-book-open" aria-hidden="true"></i></span><span><span class="hub-name">English A</span><span class="hub-sub">Textbook: chapters, summaries, question answers</span></span><i class="ph ph-caret-right" aria-hidden="true"></i></a>
           <a class="hub-row" href="#/b"><span class="hub-icon"><i class="ph ph-text-aa" aria-hidden="true"></i></span><span><span class="hub-name">English B</span><span class="hub-sub">Grammar</span></span><i class="ph ph-caret-right" aria-hidden="true"></i></a>
