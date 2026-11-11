@@ -78,24 +78,6 @@ export default async function handler(req, res) {
   // Opening /api/chat in a browser shows a small health report (never the key itself), to check the Vercel setup.
   if (req.method === "GET") {
     const k = process.env.NVIDIA_API_KEY || "";
-    if (k && req.query && req.query.probe) { // TEMP: time one model on a real question
-      const t0 = Date.now(); let first = 0, content = "", reasoning = 0, status = 0, err = "";
-      try {
-        const q = String(req.query.q || "Explain the present perfect tense with examples");
-        const sys = `${INSTRUCTIONS}\n\n<contents>\n${INDEX}\n</contents>\n\n<notes>\n${pick(q, 20000)}\n</notes>`;
-        const extra = req.query.extra ? JSON.parse(req.query.extra) : {};
-        const ctl = new AbortController(); setTimeout(() => ctl.abort(), 50000);
-        const r = await fetch(`${BASE}/chat/completions`, { method: "POST", signal: ctl.signal, headers: { Authorization: `Bearer ${k.trim()}`, "Content-Type": "application/json", Accept: "text/event-stream" },
-          body: JSON.stringify({ model: String(req.query.probe), messages: [{ role: "system", content: sys }, { role: "user", content: q }], max_tokens: 4000, temperature: 0.3, stream: true, ...extra }) });
-        status = r.status;
-        if (!r.ok) err = (await r.text()).slice(0, 300);
-        else { const dec = new TextDecoder(); let buf = "";
-          for await (const c of r.body) { buf += dec.decode(c, { stream: true }); const ls = buf.split("\n"); buf = ls.pop();
-            for (const l of ls) { if (!l.startsWith("data:")) continue; const e = safeParse(l.slice(5).trim()); const d = e && e.choices && e.choices[0] && e.choices[0].delta; if (!d) continue;
-              if (d.reasoning_content) reasoning += d.reasoning_content.length; if (d.content) { if (!first) first = Date.now() - t0; content += d.content; } } } }
-      } catch (e) { err = String(e); }
-      return res.status(200).json({ model: req.query.probe, status, firstTextMs: first, totalMs: Date.now() - t0, reasoningChars: reasoning, answerChars: content.length, answer: content.slice(0, 1800), err });
-    }
     return res.status(200).json({
       keyFound: !!k,
       keyLooksRight: k.trim().startsWith("nvapi-") && k === k.trim(),
@@ -127,10 +109,12 @@ export default async function handler(req, res) {
   const send = (obj) => res.write(`${JSON.stringify(obj)}\n`);
   let started = false;
   try {
-    const call = () => fetch(`${BASE}/chat/completions`, {
+    // "reasoning_effort: low" tells the model not to think for long before it starts writing. Measured on this
+    // site: first words after about 1 second instead of about 40. A model that does not know the setting gets asked again without it.
+    const call = (quick = true) => fetch(`${BASE}/chat/completions`, {
       method: "POST", signal: ctrl.signal,
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", Accept: "text/event-stream" },
-      body: JSON.stringify({ model, messages: [{ role: "system", content: system }, ...messages], max_tokens: 4000, temperature: 0.3, stream: true }),
+      body: JSON.stringify({ model, messages: [{ role: "system", content: system }, ...messages], max_tokens: 4000, temperature: 0.3, stream: true, ...(quick ? { reasoning_effort: "low" } : {}) }),
     });
     let up = await call();
     for (let tries = 0; tries < 4 && (up.status === 404 || up.status === 410); tries++) { // model retired or renamed
@@ -141,6 +125,7 @@ export default async function handler(req, res) {
       model = other;
       up = await call();
     }
+    if (up.status === 400 || up.status === 422) up = await call(false);
     if (!up.ok || !up.body) {
       const detail = (await up.text().catch(() => "")).slice(0, 300);
       console.error("chat upstream error:", up.status, detail);
