@@ -6,7 +6,7 @@ All question text is copied exactly from `assets/Past_papers.pdf` and lives in `
 
 ## Features
 Built mobile first, like an app, with a bottom tab bar:
-- **Home:** 3D ring of the ten papers as study cards (drag to spin, tap to open), your progress, and a swipeable row of papers.
+- **Home:** a moving stack of the most repeated questions (tap to practise), your progress, and a swipeable row of papers.
 - **Papers:** pick a paper from the chip row or swipe left and right between papers. Switch between Q.8, Q.9 and the English medium question. Tick sentences you have practised. Search every paper in English or Urdu.
 - **Practice:** a flashcard deck for Q.8, Q.9 or only repeated questions. Swipe right if you can do it, left to see it again later.
 - **Repeated:** every repeated question with how many times it came, each paper tappable.
@@ -28,4 +28,3 @@ Upload the folder as-is to GitHub Pages, Netlify or Vercel (static site, no fram
 - `css/styles.css`: design tokens, layout, motion
 - `js/data.js`: all paper text (edit here to add a new year)
 - `js/app.js`: rendering, filters, search, theme, menu
-- `js/scene.js`: the Three.js 3D scene

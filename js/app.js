@@ -111,6 +111,34 @@ $("#cover-head").textContent = COVER.boxHeading;
 $("#cover-note").innerHTML = COVER.boxNote;
 $("#footer-text").textContent = COVER.footer;
 
+/* Home preview: a small stack of the most repeated questions, cycling like the practice deck. */
+(() => {
+  const rows = [REPEATED.q9[0], REPEATED.q8[0], REPEATED.q9[1], REPEATED.q8[1], REPEATED.q9[2], REPEATED.q9[3]];
+  const stack = $("#preview-stack");
+  stack.innerHTML = rows.map((r) => {
+    const ur = REPEATED.q8.includes(r);
+    return `<span class="pcard" data-depth="hidden">
+      <span class="p-top"><span class="p-q">${ur ? "Q.8" : "Q.9"}</span><span class="rep-tag">Repeated ${r.times}×</span></span>
+      <span class="p-body"><span class="${ur ? "ur" : "en"}" ${ur ? 'lang="ur" dir="rtl"' : ""}>${esc(r.items[0])}</span></span>
+      <span class="p-in">${esc(r.in)}</span>
+    </span>`;
+  }).join("");
+  const cards = [...stack.children];
+  let top = 0;
+  const lay = () => cards.forEach((c, i) => {
+    const d = (i - top + cards.length) % cards.length;
+    c.dataset.depth = d < 3 ? String(d) : d === cards.length - 1 && c.dataset.depth === "0" ? "out" : "hidden";
+  });
+  lay();
+  if (reduceMotion) return;
+  let timer = null;
+  const tick = () => { top = (top + 1) % cards.length; lay(); };
+  const start = () => { if (!timer) timer = setInterval(tick, 3200); };
+  const stop = () => { clearInterval(timer); timer = null; };
+  new IntersectionObserver(([en]) => (en.isIntersecting && !document.hidden ? start() : stop())).observe(stack);
+  document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+})();
+
 function renderProgress() {
   const n = done.size, total = ITEMS.length;
   const C = 2 * Math.PI * 24;
@@ -490,7 +518,6 @@ function syncTabs(active) {
   wide.addEventListener?.("change", draw);
   draw();
 })();
-window.addEventListener("open-paper", (e) => { location.hash = `#/papers/${e.detail}`; });
 
 /* ---------- Top bar hairline once content scrolls under it ---------- */
 const sentinel = document.createElement("div");
