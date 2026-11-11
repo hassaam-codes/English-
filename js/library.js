@@ -26,7 +26,7 @@ function listHTML(book) {
     // A file, not a page: the row opens the PDF itself
     ? `<a class="chapter" style="--i:${Math.min(i, 10)}" href="${esc(ch.pdf)}" target="_blank" rel="noopener">
       <span class="chapter-no chapter-file"><i class="ph ph-file-pdf" aria-hidden="true"></i></span>
-      <span><span class="chapter-title">${esc(ch.title)}</span><span class="chapter-meta">PDF</span></span>
+      <span><span class="chapter-title">${esc(ch.title)}</span><span class="chapter-meta">${esc(ch.fileNote || "PDF")}</span></span>
       <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>`
     : `<a class="chapter" style="--i:${Math.min(i, 10)}" href="#/${book.key}/${encodeURIComponent(ch.id)}">
       <span class="chapter-no">${esc(ch.no || i + 1)}</span>

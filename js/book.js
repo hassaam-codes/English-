@@ -20,6 +20,7 @@
 //   { title: "Exercise 1", kind: "pairs", items: [{ en: "English sentence.", ur: "اردو جملہ۔" }] }   // Urdu with its English
 //
 // A long chapter can live in its own file under js/book/ and be imported here.
+import chapterQuestions from "./book/chapter-questions.js";
 import tenses from "./book/tenses.js";
 import pastTenses from "./book/past-tenses.js";
 import futureTenses from "./book/future-tenses.js";
@@ -29,7 +30,7 @@ export const ENGLISH_A = {
   name: "English A",
   label: "Textbook",
   about: "Every chapter of the book with its summary and question answers",
-  chapters: [],
+  chapters: [...chapterQuestions],
 };
 
 export const ENGLISH_B = {
