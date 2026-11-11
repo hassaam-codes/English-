@@ -8,8 +8,23 @@
 // answer back as one JSON object per line: {"t":"text"}, {"error":"..."} and finally {"done":true}.
 import { INDEX, pick } from "./_knowledge.js";
 
-const API_URL = `${process.env.AI_BASE_URL || "https://integrate.api.nvidia.com/v1"}/chat/completions`;
-const MODEL = process.env.AI_MODEL || "meta/llama-3.3-70b-instruct";
+const BASE = process.env.AI_BASE_URL || "https://integrate.api.nvidia.com/v1";
+// NVIDIA retires models from time to time. If the chosen one is gone, the server asks NVIDIA which models
+// exist and moves to the first one from this list (best first), so the chat keeps working without a code change.
+const PREFERRED = [/^meta\/llama-4.*instruct/, /^meta\/llama-3\.[3-9].*70b-instruct/, /^openai\/gpt-oss-120b/, /^deepseek-ai\/deepseek-v3/, /^moonshotai\/kimi-k2/, /^qwen\/qwen3.*instruct/, /^mistralai\/mistral-(large|medium)/, /^meta\/llama-3\.1-405b-instruct/, /^meta\/llama-3\.1-70b-instruct/, /^google\/gemma-3-27b-it/, /^openai\/gpt-oss-20b/, /^meta\/llama-3\.1-8b-instruct/];
+let model = process.env.AI_MODEL || "meta/llama-3.3-70b-instruct";
+const dead = new Set();
+async function listModels(key) {
+  const r = await fetch(`${BASE}/models`, { headers: { Authorization: `Bearer ${key}` } });
+  if (!r.ok) return [];
+  const j = await r.json().catch(() => null);
+  return ((j && j.data) || []).map((m) => m.id).filter(Boolean);
+}
+async function nextModel(key) {
+  const ids = await listModels(key);
+  for (const re of PREFERRED) { const hit = ids.filter((id) => re.test(id) && !dead.has(id)).sort().pop(); if (hit) return hit; }
+  return null;
+}
 
 const MAX_TURNS = 12;            // messages kept from the conversation
 const MAX_CHARS = 2000;          // per message
@@ -67,7 +82,8 @@ export default async function handler(req, res) {
       keyFound: !!k,
       keyLooksRight: k.trim().startsWith("nvapi-") && k === k.trim(),
       environment: process.env.VERCEL_ENV || "unknown",
-      model: MODEL,
+      model,
+      models: k && "models" in (req.query || {}) ? await listModels(k.trim()).catch(() => []) : undefined,
       version: (process.env.VERCEL_GIT_COMMIT_SHA || "").slice(0, 7),
       otherAiVariables: Object.keys(process.env).filter((n) => /nvidia|nvapi|anthropic|api_key/i.test(n) && n !== "NVIDIA_API_KEY"),
     });
@@ -93,18 +109,27 @@ export default async function handler(req, res) {
   const send = (obj) => res.write(`${JSON.stringify(obj)}\n`);
   let started = false;
   try {
-    const up = await fetch(API_URL, {
+    const call = () => fetch(`${BASE}/chat/completions`, {
       method: "POST", signal: ctrl.signal,
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json", Accept: "text/event-stream" },
-      body: JSON.stringify({ model: MODEL, messages: [{ role: "system", content: system }, ...messages], max_tokens: 1500, temperature: 0.3, stream: true }),
+      body: JSON.stringify({ model, messages: [{ role: "system", content: system }, ...messages], max_tokens: 1500, temperature: 0.3, stream: true }),
     });
+    let up = await call();
+    for (let tries = 0; tries < 4 && (up.status === 404 || up.status === 410); tries++) { // model retired or renamed
+      console.error("chat model unavailable:", model, up.status);
+      dead.add(model);
+      const other = await nextModel(key);
+      if (!other) break;
+      model = other;
+      up = await call();
+    }
     if (!up.ok || !up.body) {
       const detail = (await up.text().catch(() => "")).slice(0, 300);
       console.error("chat upstream error:", up.status, detail);
       const message =
         up.status === 401 || up.status === 403 ? "The AI key is not working. The site owner needs to check it in Vercel."
         : up.status === 429 ? "The AI helper is busy right now. Try again in a minute."
-        : up.status === 404 ? "The AI model was not found. The site owner needs to check AI_MODEL in Vercel."
+        : up.status === 404 || up.status === 410 ? "The AI model was not found. The site owner needs to check AI_MODEL in Vercel."
         : "The AI helper had a problem. Try again.";
       return fail(502, message);
     }
