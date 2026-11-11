@@ -334,7 +334,7 @@ function fling(dir) {
   top.classList.add("flying");
   top.classList.remove("dragging");
   top.style.transition = "transform 320ms cubic-bezier(0.22,1,0.36,1), opacity 320ms cubic-bezier(0.22,1,0.36,1)";
-  top.style.transform = `translateX(${dir * 120}vw) rotate(${dir * 18}deg)`;
+  top.style.transform = `translateX(${dir * 140}%) rotate(${dir * 18}deg)`;
   top.style.opacity = "0";
   setTimeout(() => top.remove(), 340);
   deck.queue.shift();

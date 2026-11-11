@@ -40,7 +40,7 @@
 
 /* ---------- Base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; overflow-x: hidden; overflow-x: clip; }
 body {
   margin: 0; font-family: var(--sans); font-size: 16px; line-height: 1.5; color: var(--text); background: var(--bg);
   -webkit-font-smoothing: antialiased; overflow-x: hidden; overscroll-behavior-y: none;
@@ -75,7 +75,9 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .icon-btn:active { transform: scale(0.94); }
 
 /* ---------- Views ---------- */
-main { padding: 0 16px calc(var(--tabbar-h) + var(--safe-b) + 32px); max-width: 720px; margin: 0 auto; }
+main { padding: 0 16px calc(var(--tabbar-h) + var(--safe-b) + 32px); max-width: 720px; margin: 0 auto; overflow-x: hidden; overflow-x: clip; }
+/* Cards that fly off the deck must never widen the page (that makes phones zoom out). */
+#view-practice { overflow-x: hidden; overflow-x: clip; margin: 0 -16px; padding: 0 16px; }
 .view { animation: view-in 360ms var(--ease) both; }
 .view.from-left { animation-name: view-in-left; }
 .view.from-right { animation-name: view-in-right; }
