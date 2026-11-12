@@ -44,10 +44,12 @@
 
 /* ---------- Base ---------- */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; overflow-x: hidden; overflow-x: clip; }
+/* Sideways overflow is cut off on the page itself (html), never on body. If body also clips, it becomes its own
+   scroll box, and "overscroll-behavior: none" on it then stops a thumb or wheel from scrolling the page at all. */
+html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; overflow-x: hidden; overscroll-behavior-y: none; }
 body {
   margin: 0; font-family: var(--sans); font-size: 16px; line-height: 1.5; color: var(--text); background: var(--bg);
-  -webkit-font-smoothing: antialiased; overflow-x: hidden; overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
 }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
