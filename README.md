@@ -78,3 +78,10 @@ which is given the parts of the site's notes that match the question (English A,
 - Optional variable `AI_MODEL` picks the model (default `minimaxai/minimax-m3.1-flash`; if NVIDIA retires it the server moves to another available model by itself. Open `/api/chat?models` on the site to see what the key can use).
 - Limits built in: 20 questions per visitor per 10 minutes, 2,000 characters per question, requests only from the site itself.
 - The static preview (`python3 -m http.server`) has no `/api`, so the chat shows "not set up" there. Use `vercel dev` to try it locally.
+
+## Pages for search engines
+
+The app keeps everything on one address, which search engines cannot index section by section. `node tools/build-pages.mjs`
+writes a real page for every past paper (`/past-papers/2024-group-1/`), chapter (`/english-a/chapter-3/`) and tense
+(`/english-b/present-perfect-tense/`), plus `sitemap.xml` and `robots.txt`. Run it again after changing the content files and commit the result.
+The live address is set once at the top of that script (`SITE`); change it there if the site moves to its own domain.

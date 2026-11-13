@@ -1,0 +1,43 @@
+/* Reading pages made by tools/build-pages.mjs (the ones search engines index). They reuse styles.css. */
+body.doc { animation: none; }
+.doc .topbar { justify-content: space-between; }
+.doc-nav { display: flex; gap: 2px; font-size: 14px; }
+.doc-nav a { padding: 8px 10px; border-radius: 10px; color: var(--text-2); white-space: nowrap; }
+.doc-nav a:hover { background: var(--raised); color: var(--text); }
+@media (max-width: 420px) { .doc-nav a:first-child { display: none; } .doc-nav a { padding: 8px; } }
+.doc-main { max-width: 760px; padding: 8px 16px 48px; }
+.crumbs { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 0 4px; font-size: 13px; color: var(--muted); }
+.crumbs a { color: var(--text-2); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.crumbs a:hover { color: var(--accent); }
+.doc-head { display: grid; gap: 12px; padding: 12px 0 20px; }
+.doc-head .view-title { font-size: clamp(28px, 7vw, 40px); }
+.doc-head .chapter-kicker { margin: 0 0 -4px; }
+.doc-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 0; }
+.doc-actions .btn { display: inline-flex; align-items: center; }
+.doc-q { margin: 28px 0 8px; font-family: var(--sans); font-size: 17px; line-height: 1.45; font-weight: 600; letter-spacing: 0; text-wrap: pretty; }
+.doc-head + .doc-q { margin-top: 8px; }
+.doc-p { margin: 0 0 14px; font-size: 16px; line-height: 1.65; max-width: 68ch; }
+.doc-p strong { font-weight: 600; }
+.doc-p a, .doc-foot a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.doc-indent { padding-left: 20px; }
+.doc-note { color: var(--muted); font-size: 14px; margin-top: 20px; }
+.doc .pairs { counter-reset: n; }
+.doc .pair p { margin: 0; }
+.doc-answer { margin-top: 6px !important; padding-top: 8px; border-top: 1px dashed var(--line); font-size: 16px; line-height: 1.5; font-weight: 500; }
+.doc-answer span { display: inline-block; margin-right: 6px; font-family: var(--mono); font-size: 11px; font-weight: 400; color: var(--accent); text-transform: none; }
+.doc-swap { text-align: center; color: var(--muted); font-size: 13px; }
+.doc-where { margin-top: 8px !important; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.doc-list { margin-bottom: 20px; }
+.doc-arrow { font-size: 20px; color: var(--muted); padding-right: 4px; }
+.doc-pager { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 36px; }
+.doc-pager a { display: grid; gap: 2px; padding: 14px 16px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); font-weight: 500; line-height: 1.35; transition: background-color 150ms var(--ease); }
+.doc-pager a:hover { background: var(--raised); }
+.doc-pager a[rel="next"] { text-align: right; }
+.doc-pager small { font-family: var(--mono); font-size: 11px; font-weight: 400; color: var(--muted); }
+.doc-foot { max-width: 760px; margin: 0 auto; padding: 20px 16px 40px; font-size: 14px; line-height: 1.6; color: var(--text-2); border-top: 1px solid var(--line); }
+.doc-foot p { margin: 0; }
+/* Small "read online" line on the app's home page: real links for search engines and for people */
+.home-links { margin: 20px 2px 0; font-size: 13px; line-height: 1.7; color: var(--muted); }
+.home-links a { color: var(--text-2); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.home-links a:hover { color: var(--accent); }
+@media (min-width: 960px) { .doc-main { padding-top: 24px; } .home-links { grid-column: 2; } }
